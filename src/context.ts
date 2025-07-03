@@ -53,7 +53,8 @@ export function createContext(env?: Partial<Env>): Context {
 
   const db = getDatabase(parsedEnv.DATABASE_DIRECTORY);
 
-  return {
+  // Create the context object first
+  const context: Context = {
     customerRepository: new DrizzlePqliteCustomerRepository(db),
     contactRepository: new DrizzlePqliteContactRepository(db),
     contactHistoryRepository: new DrizzlePqliteContactHistoryRepository(db),
@@ -78,12 +79,17 @@ export function createContext(env?: Partial<Env>): Context {
     integrationRepository: new DrizzlePqliteIntegrationRepository(db),
     integrationService: new DrizzlePqliteIntegrationService(),
     importExportRepository: new DrizzlePqliteImportExportRepository(db),
-    importExportService: new DrizzlePqliteImportExportService(),
+    importExportService: null as unknown as DrizzlePqliteImportExportService, // Will be set below
     storageManager: new LocalStorageManager(
       parsedEnv.UPLOAD_DIR,
       parsedEnv.FILES_BASE_URL,
     ),
   };
+
+  // Set the import export service with the context
+  context.importExportService = new DrizzlePqliteImportExportService(context);
+
+  return context;
 }
 
 export const context = createContext();

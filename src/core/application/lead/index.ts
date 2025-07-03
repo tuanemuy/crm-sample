@@ -1,0 +1,12 @@
+export { convertLeadToCustomer } from "./convertLeadToCustomer";
+export { createLead } from "./createLead";
+export { deleteLead } from "./deleteLead";
+export { filterLeadsByScore } from "./filterLeadsByScore";
+export { getLeadDetails } from "./getLeadDetails";
+export { listLeads } from "./listLeads";
+export { recordLeadBehavior } from "./recordLeadBehavior";
+export { searchLeads } from "./searchLeads";
+export { updateLead } from "./updateLead";
+export { updateLeadStatus } from "./updateLeadStatus";
+export { viewLeadBehaviorHistory } from "./viewLeadBehaviorHistory";
+export { viewScoringDetail } from "./viewScoringDetail";

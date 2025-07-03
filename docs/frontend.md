@@ -11,7 +11,7 @@ import { listUserPosts } from "@/core/application/post/listPosts";
 import { validate, type ValidationError } from "@/lib/validation";
 import type { Pagination } from "@/lib/pagination";
 import type { ActionState } from "@/lib/actionState";
-import { context } from "@/core/context";
+import { context } from "@/context";
 
 export async function listUserPostsAction(
   userId: string,

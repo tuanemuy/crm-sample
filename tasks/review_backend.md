@@ -4,13 +4,13 @@
 
 - `docs/requirements.md` に要件を定義した
 - `docs/backend.md` にバックエンドの実装例を記載した
-- `docs/usecases.tsv` にページ構成とユースケースを定義した
+- `docs/usecases.md` にページ構成とユースケースを定義した
 
 ## タスク
 
 - 実装が設計に従っているか確認する
 - コードの品質をレビューする
-- `logs/${yyyyMMddHHmm}_review_backend.md` を更新する
+- `logs/$(date "+%Y%m%d%H%M)_review_backend.md` を更新する
 
 ## 備考
 

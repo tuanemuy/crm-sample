@@ -1,18 +1,6 @@
 import { err, ok, type Result } from "neverthrow";
 import type { z } from "zod/v4";
-import { AnyError } from "./error";
-
-export class ValidationError<T> extends AnyError {
-  override readonly name = "ValidationError";
-
-  constructor(
-    public readonly error: z.ZodError<T>,
-    override readonly message: string,
-    cause?: unknown,
-  ) {
-    super(message, cause);
-  }
-}
+import { ValidationError } from "./error";
 
 /**
  * Validates data against a schema and returns a Result
@@ -20,14 +8,13 @@ export class ValidationError<T> extends AnyError {
 export function validate<T extends z.ZodType>(
   schema: T,
   data: unknown,
-): Result<z.infer<T>, ValidationError<z.infer<T>>> {
+): Result<z.infer<T>, ValidationError> {
   const result = schema.safeParse(data);
 
   if (!result.success) {
     return err(
       new ValidationError(
-        result.error,
-        "Validation error occurred",
+        `Validation error: ${result.error.message}`,
         result.error,
       ),
     );

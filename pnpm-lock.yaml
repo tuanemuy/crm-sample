@@ -17,6 +17,9 @@ importers:
       '@libsql/client':
         specifier: ^0.15.9
         version: 0.15.9
+      bcryptjs:
+        specifier: ^3.0.2
+        version: 3.0.2
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
@@ -54,6 +57,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.10
+      '@types/bcryptjs':
+        specifier: ^3.0.0
+        version: 3.0.0
       '@types/node':
         specifier: ^20
         version: 20.19.1
@@ -72,12 +78,12 @@ importers:
       drizzle-kit:
         specifier: ^0.31.1
         version: 0.31.1
-      local-task:
-        specifier: ^0.1.3
-        version: 0.1.3
       tailwindcss:
         specifier: ^4
         version: 4.1.10
+      tdlite:
+        specifier: ^0.2.1
+        version: 0.2.1
       typescript:
         specifier: ^5
         version: 5.8.3
@@ -907,6 +913,10 @@ packages:
   '@tailwindcss/postcss@4.1.10':
     resolution: {integrity: sha512-B+7r7ABZbkXJwpvt2VMnS6ujcDoR2OOcFaqrLIo1xbcdxje4Vf+VgJdBzNNbrAjBj/rLZ66/tlQ1knIGNLKOBQ==}
 
+  '@types/bcryptjs@3.0.0':
+    resolution: {integrity: sha512-WRZOuCuaz8UcZZE4R5HXTco2goQSI2XxjGY3hbM/xDvwmqFWd4ivooImsMx65OKM6CtNKbnZ5YL+YwAwK7c1dg==}
+    deprecated: This is a stub types definition. bcryptjs provides its own type definitions, so you do not need this installed.
+
   '@types/chai@5.2.2':
     resolution: {integrity: sha512-8kB30R7Hwqf40JPiKhVzodJs2Qc1ZJ5zuT3uzw5Hq/dhNCl3G3l83jfpdI1e20BP348+fV7VIL/+FxaXkqBmWg==}
 
@@ -968,6 +978,10 @@ packages:
 
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
+
+  bcryptjs@3.0.2:
+    resolution: {integrity: sha512-k38b3XOZKv60C4E2hVsXTolJWfkGRMbILBIe2IBITXciy5bOsTKot5kDrf3ZfufQtQOUN5mXceUEpU1rTl9Uog==}
+    hasBin: true
 
   better-sqlite3@12.2.0:
     resolution: {integrity: sha512-eGbYq2CT+tos1fBwLQ/tkBt9J5M3JEHjku4hbvQUePCckkvVf14xWj+1m7dGoK81M/fOjFT7yM9UMeKT/+vFLQ==}
@@ -1330,10 +1344,6 @@ packages:
     resolution: {integrity: sha512-xi6IyHML+c9+Q3W0S4fCQJOym42pyurFiJUHEcEyHS0CeKzia4yZDEsLlqOFykxOdHpNy0NmvVO31vcSqAxJCg==}
     engines: {node: '>= 12.0.0'}
 
-  local-task@0.1.3:
-    resolution: {integrity: sha512-NaGkN0ABil/VtUss2QGm0oszkIEReH4QarYAazxmwvTK6vOgNHtWqUqpUH08zgd+kA4EDLt9hM+NSl5p12hnkA==}
-    hasBin: true
-
   loupe@3.1.4:
     resolution: {integrity: sha512-wJzkKwJrheKtknCOKNEtDK4iqg/MxmZheEMtSTYvnzRdEYaZzmgH976nenp8WdJRdx5Vc1X/9MO0Oszl6ezeXg==}
 
@@ -1573,6 +1583,10 @@ packages:
   tar@7.4.3:
     resolution: {integrity: sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==}
     engines: {node: '>=18'}
+
+  tdlite@0.2.1:
+    resolution: {integrity: sha512-kakqUKIRrayhkJPVdZXAeoaToite0g5poP12kGOmxgln6LgA0DDf07tyD4a2sDz1s4AVz3ZUNRneilBMtrgVNA==}
+    hasBin: true
 
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
@@ -2265,6 +2279,10 @@ snapshots:
       postcss: 8.5.6
       tailwindcss: 4.1.10
 
+  '@types/bcryptjs@3.0.0':
+    dependencies:
+      bcryptjs: 3.0.2
+
   '@types/chai@5.2.2':
     dependencies:
       '@types/deep-eql': 4.0.2
@@ -2336,6 +2354,8 @@ snapshots:
   assertion-error@2.0.1: {}
 
   base64-js@1.5.1: {}
+
+  bcryptjs@3.0.2: {}
 
   better-sqlite3@12.2.0:
     dependencies:
@@ -2624,10 +2644,6 @@ snapshots:
       lightningcss-win32-arm64-msvc: 1.30.1
       lightningcss-win32-x64-msvc: 1.30.1
 
-  local-task@0.1.3:
-    dependencies:
-      better-sqlite3: 12.2.0
-
   loupe@3.1.4: {}
 
   magic-string@0.30.17:
@@ -2905,6 +2921,10 @@ snapshots:
       minizlib: 3.0.2
       mkdirp: 3.0.1
       yallist: 5.0.0
+
+  tdlite@0.2.1:
+    dependencies:
+      better-sqlite3: 12.2.0
 
   tinybench@2.9.0: {}
 

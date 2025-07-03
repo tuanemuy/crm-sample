@@ -145,7 +145,7 @@ export const posts = pgTable(
 import { z } from "zod/v4";
 import { Result } from "neverthrow";
 import type { PostRepository } from "@/core/domain/post/ports/postRepository";
-import type { Context } from "@/core/context";
+import type { Context } from "@/context";
 
 export const createPostInputSchema = z.object({
   content: z.string().min(1).max(500),
@@ -168,7 +168,7 @@ export async function createPost(
 
 ```typescript
 // Context object for specific environment
-// ex: src/core/context.ts
+// ex: src/context.ts
 
 export const envSchema = z.object({
   DATABASE_URL: z.string(),

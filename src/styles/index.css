@@ -1,2 +1,7 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  /* biome-ignore lint: lint/correctness/noUnknownProperty */
+  themes:
+    cupcake --default,
+    halloween --prefersdark;
+}

@@ -14,10 +14,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Task Management
 
 - `pnpm task add <category> <jsonArray>` - Add new tasks to the task list
-    - `[{ "customId": "taskId", "name": "Task Name", "description": "Task Description" }]`
+    - `[{ "customId": "customId", "name": "Task Name", "description": "Task Description" }]`
 - `pnpm task todo <category>` - List all wip tasks in the specified category
-- `pnpm task done <category> <taskId>` - Mark a task as done in the specified category
-- `pnpm task wip <category> <taskId>` - Mark a task as wip in the specified category
+- `pnpm task search <category> <query>` - Search for tasks in the specified category. `query` can be a string to search in task customIds, names or descriptions
+- `pnpm task done <category> <id or customId>` - Mark a task as done in the specified category
+- `pnpm task wip <category> <id or customId>` - Mark a task as wip in the specified category
+- `pnpm task get <category> <id or customId>` - Get details of a specific task in the specified category
 
 ## Code Quality
 
@@ -73,6 +75,8 @@ Next.js 15 application code using:
     - `src/app/styles/index.css`: Entry point for global styles
 - Server Actions
     - `src/actions/${domain}.ts`: Server actions for handling application services
+- Asynchronous Data Fetching
+    - Fetch data asynchronously at the component level, not at the page level
 
 ### Example Implementation
 

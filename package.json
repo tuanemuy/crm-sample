@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.4",
+    "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.1.1",
     "@libsql/client": "^0.15.9",
     "bcryptjs": "^3.0.2",
@@ -43,8 +44,8 @@
     "@types/uuid": "^10.0.0",
     "daisyui": "^5.0.43",
     "drizzle-kit": "^0.31.1",
-    "tdlite": "^0.2.1",
     "tailwindcss": "^4",
+    "tdlite": "^0.2.1",
     "typescript": "^5",
     "vitest": "^3.2.4"
   }

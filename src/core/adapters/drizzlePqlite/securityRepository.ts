@@ -6,8 +6,8 @@ import {
   gte,
   ilike,
   lte,
-  sql,
   type SQL,
+  sql,
 } from "drizzle-orm";
 import { err, ok, type Result } from "neverthrow";
 import type { SecurityRepository } from "@/core/domain/security/ports/securityRepository";

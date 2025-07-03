@@ -141,16 +141,24 @@ export class DrizzlePqliteOrganizationRepository
 
   async listOrganizations(
     query: ListOrganizationsQuery,
-  ): Promise<Result<{ items: Organization[]; count: number }, RepositoryError>> {
+  ): Promise<
+    Result<{ items: Organization[]; count: number }, RepositoryError>
+  > {
     const { pagination, filter, sortOrder } = query;
     const limit = pagination.limit;
     const offset = (pagination.page - 1) * pagination.limit;
 
     const filters = [
-      filter?.keyword ? like(organizations.name, `%${filter.keyword}%`) : undefined,
-      filter?.industry ? eq(organizations.industry, filter.industry) : undefined,
+      filter?.keyword
+        ? like(organizations.name, `%${filter.keyword}%`)
+        : undefined,
+      filter?.industry
+        ? eq(organizations.industry, filter.industry)
+        : undefined,
       filter?.size ? eq(organizations.size, filter.size) : undefined,
-      filter?.isActive !== undefined ? eq(organizations.isActive, filter.isActive) : undefined,
+      filter?.isActive !== undefined
+        ? eq(organizations.isActive, filter.isActive)
+        : undefined,
     ].filter((filter) => filter !== undefined);
 
     try {
@@ -159,7 +167,11 @@ export class DrizzlePqliteOrganizationRepository
           .select()
           .from(organizations)
           .where(and(...filters))
-          .orderBy(sortOrder === "asc" ? organizations.createdAt : desc(organizations.createdAt))
+          .orderBy(
+            sortOrder === "asc"
+              ? organizations.createdAt
+              : desc(organizations.createdAt),
+          )
           .limit(limit)
           .offset(offset),
         this.db

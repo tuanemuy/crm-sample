@@ -447,7 +447,9 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
 
       // Write file
       const filePath = path.join(exportsDir, job.fileName);
-      await fs.writeFile(filePath, csvContent, { encoding: encoding as BufferEncoding });
+      await fs.writeFile(filePath, csvContent, {
+        encoding: encoding as BufferEncoding,
+      });
 
       // Update job progress
       await this.updateJobProgress(job.id, {
@@ -553,7 +555,9 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
 
       // Write file
       const filePath = path.join(exportsDir, job.fileName);
-      await fs.writeFile(filePath, xmlContent, { encoding: encoding as BufferEncoding });
+      await fs.writeFile(filePath, xmlContent, {
+        encoding: encoding as BufferEncoding,
+      });
 
       // Update job progress
       await this.updateJobProgress(job.id, {
@@ -805,17 +809,29 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
     if (operation === "import") {
       // Map record fields to customer creation parameters
       const customerData = {
-        name: String(record.name || record.customer_name || record.companyName || ""),
+        name: String(
+          record.name || record.customer_name || record.companyName || "",
+        ),
         industry: record.industry ? String(record.industry) : undefined,
-        size: record.size as "small" | "medium" | "large" | "enterprise" | undefined,
+        size: record.size as
+          | "small"
+          | "medium"
+          | "large"
+          | "enterprise"
+          | undefined,
         location: record.location ? String(record.location) : undefined,
         foundedYear: record.foundedYear
           ? Number(record.foundedYear)
           : undefined,
         website: record.website ? String(record.website) : undefined,
-        description: record.description ? String(record.description) : undefined,
-        status: (record.status as "active" | "inactive" | "archived") || "active",
-        assignedUserId: record.assignedUserId ? String(record.assignedUserId) : undefined,
+        description: record.description
+          ? String(record.description)
+          : undefined,
+        status:
+          (record.status as "active" | "inactive" | "archived") || "active",
+        assignedUserId: record.assignedUserId
+          ? String(record.assignedUserId)
+          : undefined,
       };
 
       const result = await this.context.customerRepository.create(customerData);
@@ -833,13 +849,15 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
   ): Promise<Result<unknown, ApplicationError>> {
     if (operation === "import") {
       const contactData = {
-        customerId: String(record.customerId || record.customer_id || ''),
-        name: String(record.name || record.contact_name || record.fullName || ''),
-        title: String(record.title || record.job_title || ''),
-        department: String(record.department || ''),
-        email: String(record.email || record.email_address || ''),
-        phone: String(record.phone || record.phone_number || ''),
-        mobile: String(record.mobile || record.mobile_number || ''),
+        customerId: String(record.customerId || record.customer_id || ""),
+        name: String(
+          record.name || record.contact_name || record.fullName || "",
+        ),
+        title: String(record.title || record.job_title || ""),
+        department: String(record.department || ""),
+        email: String(record.email || record.email_address || ""),
+        phone: String(record.phone || record.phone_number || ""),
+        mobile: String(record.mobile || record.mobile_number || ""),
         isPrimary: Boolean(record.isPrimary || record.is_primary),
         isActive: record.isActive !== false,
       };
@@ -859,27 +877,39 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
   ): Promise<Result<unknown, ApplicationError>> {
     if (operation === "import") {
       const leadData = {
-        firstName:
-          String(record.firstName ||
-          record.first_name ||
-          (typeof record.name === 'string' ? record.name.split(" ")[0] : '') ||
-          ""),
-        lastName:
-          String(record.lastName ||
-          record.last_name ||
-          (typeof record.name === 'string' ? record.name.split(" ").slice(1).join(" ") : '') ||
-          ""),
-        email: String(record.email || record.email_address || ''),
-        phone: String(record.phone || record.phone_number || ''),
-        company: String(record.company || record.company_name || ''),
-        title: String(record.title || record.job_title || ''),
-        industry: String(record.industry || ''),
-        source: String(record.source || record.lead_source || ''),
-        status: (record.status as "new" | "contacted" | "qualified" | "converted" | "rejected") || "new",
+        firstName: String(
+          record.firstName ||
+            record.first_name ||
+            (typeof record.name === "string"
+              ? record.name.split(" ")[0]
+              : "") ||
+            "",
+        ),
+        lastName: String(
+          record.lastName ||
+            record.last_name ||
+            (typeof record.name === "string"
+              ? record.name.split(" ").slice(1).join(" ")
+              : "") ||
+            "",
+        ),
+        email: String(record.email || record.email_address || ""),
+        phone: String(record.phone || record.phone_number || ""),
+        company: String(record.company || record.company_name || ""),
+        title: String(record.title || record.job_title || ""),
+        industry: String(record.industry || ""),
+        source: String(record.source || record.lead_source || ""),
+        status:
+          (record.status as
+            | "new"
+            | "contacted"
+            | "qualified"
+            | "converted"
+            | "rejected") || "new",
         score: record.score ? Number(record.score) : 0,
-        tags: Array.isArray(record.tags) ? record.tags as string[] : [],
-        notes: String(record.notes || record.description || ''),
-        assignedUserId: String(record.assignedUserId || ''),
+        tags: Array.isArray(record.tags) ? (record.tags as string[]) : [],
+        notes: String(record.notes || record.description || ""),
+        assignedUserId: String(record.assignedUserId || ""),
       };
 
       const result = await this.context.leadRepository.create(leadData);
@@ -897,18 +927,31 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
   ): Promise<Result<unknown, ApplicationError>> {
     if (operation === "import") {
       const dealData = {
-        title: String(record.title || record.deal_name || record.name || ''),
-        customerId: String(record.customerId || record.customer_id || ''),
-        contactId: String(record.contactId || record.contact_id || ''),
-        stage: (record.stage as "prospecting" | "qualification" | "proposal" | "negotiation" | "closed_won" | "closed_lost") || "prospecting",
+        title: String(record.title || record.deal_name || record.name || ""),
+        customerId: String(record.customerId || record.customer_id || ""),
+        contactId: String(record.contactId || record.contact_id || ""),
+        stage:
+          (record.stage as
+            | "prospecting"
+            | "qualification"
+            | "proposal"
+            | "negotiation"
+            | "closed_won"
+            | "closed_lost") || "prospecting",
         amount: record.amount ? String(record.amount) : "0",
         probability: record.probability ? Number(record.probability) : 0,
-        expectedCloseDate: record.expectedCloseDate && typeof record.expectedCloseDate === 'string'
-          ? new Date(record.expectedCloseDate)
-          : undefined,
-        description: String(record.description || record.notes || ''),
-        competitors: Array.isArray(record.competitors) ? record.competitors as string[] : [],
-        assignedUserId: String(record.assignedUserId || record.assigned_user_id || ''),
+        expectedCloseDate:
+          record.expectedCloseDate &&
+          typeof record.expectedCloseDate === "string"
+            ? new Date(record.expectedCloseDate)
+            : undefined,
+        description: String(record.description || record.notes || ""),
+        competitors: Array.isArray(record.competitors)
+          ? (record.competitors as string[])
+          : [],
+        assignedUserId: String(
+          record.assignedUserId || record.assigned_user_id || "",
+        ),
       };
 
       const result = await this.context.dealRepository.create(dealData);
@@ -926,22 +969,38 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
   ): Promise<Result<unknown, ApplicationError>> {
     if (operation === "import") {
       const activityData = {
-        type: (record.type as "email" | "task" | "call" | "meeting" | "note") || "task",
-        subject: String(record.subject || record.title || record.name || ''),
-        description: String(record.description || record.notes || ''),
-        status: (record.status as "completed" | "planned" | "in_progress" | "cancelled") || "planned",
-        priority: (record.priority as "medium" | "low" | "high" | "urgent") || "medium",
-        scheduledAt: record.scheduledAt && typeof record.scheduledAt === 'string'
-          ? new Date(record.scheduledAt)
-          : undefined,
-        dueDate: record.dueDate && typeof record.dueDate === 'string' ? new Date(record.dueDate) : undefined,
+        type:
+          (record.type as "email" | "task" | "call" | "meeting" | "note") ||
+          "task",
+        subject: String(record.subject || record.title || record.name || ""),
+        description: String(record.description || record.notes || ""),
+        status:
+          (record.status as
+            | "completed"
+            | "planned"
+            | "in_progress"
+            | "cancelled") || "planned",
+        priority:
+          (record.priority as "medium" | "low" | "high" | "urgent") || "medium",
+        scheduledAt:
+          record.scheduledAt && typeof record.scheduledAt === "string"
+            ? new Date(record.scheduledAt)
+            : undefined,
+        dueDate:
+          record.dueDate && typeof record.dueDate === "string"
+            ? new Date(record.dueDate)
+            : undefined,
         duration: record.duration ? Number(record.duration) : undefined,
-        customerId: String(record.customerId || record.customer_id || ''),
-        contactId: String(record.contactId || record.contact_id || ''),
-        dealId: String(record.dealId || record.deal_id || ''),
-        leadId: String(record.leadId || record.lead_id || ''),
-        assignedUserId: String(record.assignedUserId || record.assigned_user_id || ''),
-        createdByUserId: String(record.createdByUserId || record.created_by_user_id || ''),
+        customerId: String(record.customerId || record.customer_id || ""),
+        contactId: String(record.contactId || record.contact_id || ""),
+        dealId: String(record.dealId || record.deal_id || ""),
+        leadId: String(record.leadId || record.lead_id || ""),
+        assignedUserId: String(
+          record.assignedUserId || record.assigned_user_id || "",
+        ),
+        createdByUserId: String(
+          record.createdByUserId || record.created_by_user_id || "",
+        ),
       };
 
       const result = await this.context.activityRepository.create(activityData);
@@ -959,8 +1018,8 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
   ): Promise<Result<unknown, ApplicationError>> {
     if (operation === "import") {
       const userData = {
-        email: String(record.email || record.email_address || ''),
-        name: String(record.name || record.full_name || record.username || ''),
+        email: String(record.email || record.email_address || ""),
+        name: String(record.name || record.full_name || record.username || ""),
         role: (record.role as "user" | "admin" | "manager") || "user",
         isActive: record.isActive !== false,
         passwordHash: String(record.password || "defaultPassword123"), // Should be handled securely
@@ -981,19 +1040,25 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
   ): Promise<Result<unknown, ApplicationError>> {
     if (operation === "import") {
       const orgData = {
-        name: String(record.name || record.organization_name || ''),
-        displayName: String(record.displayName || record.display_name || ''),
-        description: String(record.description || ''),
-        industry: String(record.industry || ''),
-        size: (record.size as "small" | "medium" | "large" | "enterprise" | undefined) || undefined,
+        name: String(record.name || record.organization_name || ""),
+        displayName: String(record.displayName || record.display_name || ""),
+        description: String(record.description || ""),
+        industry: String(record.industry || ""),
+        size:
+          (record.size as
+            | "small"
+            | "medium"
+            | "large"
+            | "enterprise"
+            | undefined) || undefined,
         foundedYear: record.foundedYear
           ? Number(record.foundedYear)
           : undefined,
-        website: String(record.website || ''),
-        email: String(record.email || ''),
-        phone: String(record.phone || ''),
-        address: String(record.address || ''),
-        country: String(record.country || ''),
+        website: String(record.website || ""),
+        email: String(record.email || ""),
+        phone: String(record.phone || ""),
+        address: String(record.address || ""),
+        country: String(record.country || ""),
         timezone: String(record.timezone || "UTC"),
         currency: String(record.currency || "USD"),
         language: String(record.language || "en"),
@@ -1017,14 +1082,17 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
   ): Promise<Result<unknown, ApplicationError>> {
     if (operation === "import") {
       const proposalData = {
-        dealId: String(record.dealId || record.deal_id || ''),
-        customerId: String(record.customerId || record.customer_id || ''),
-        contactId: String(record.contactId || record.contact_id || ''),
-        title: String(record.title || record.proposal_title || ''),
-        description: String(record.description || ''),
+        dealId: String(record.dealId || record.deal_id || ""),
+        customerId: String(record.customerId || record.customer_id || ""),
+        contactId: String(record.contactId || record.contact_id || ""),
+        title: String(record.title || record.proposal_title || ""),
+        description: String(record.description || ""),
         status: String(record.status || "draft"),
         type: (record.type as "proposal" | "quote" | "estimate") || "proposal",
-        validUntil: record.validUntil && typeof record.validUntil === 'string' ? new Date(record.validUntil) : undefined,
+        validUntil:
+          record.validUntil && typeof record.validUntil === "string"
+            ? new Date(record.validUntil)
+            : undefined,
         subtotal: record.subtotal ? Number(record.subtotal) : 0,
         discountAmount: record.discountAmount
           ? Number(record.discountAmount)
@@ -1036,9 +1104,9 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
         taxPercent: record.taxPercent ? Number(record.taxPercent) : 0,
         totalAmount: record.totalAmount ? Number(record.totalAmount) : 0,
         currency: String(record.currency || "USD"),
-        terms: String(record.terms || ''),
-        notes: String(record.notes || ''),
-        createdBy: String(record.createdBy || record.created_by || ''),
+        terms: String(record.terms || ""),
+        notes: String(record.notes || ""),
+        createdBy: String(record.createdBy || record.created_by || ""),
       };
 
       const result =
@@ -1057,22 +1125,29 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
   ): Promise<Result<unknown, ApplicationError>> {
     if (operation === "import") {
       const documentData = {
-        filename: String(record.filename || record.file_name || ''),
+        filename: String(record.filename || record.file_name || ""),
         originalFilename: String(
           record.originalFilename ||
-          record.original_filename ||
-          record.filename || ''
+            record.original_filename ||
+            record.filename ||
+            "",
         ),
         mimeType: String(
-          record.mimeType || record.mime_type || "application/octet-stream"
+          record.mimeType || record.mime_type || "application/octet-stream",
         ),
         size: record.size ? Number(record.size) : 0,
-        url: String(record.url || record.file_url || ''),
-        description: String(record.description || ''),
-        tags: Array.isArray(record.tags) ? record.tags as string[] : [],
-        entityType: (record.entityType || record.entity_type || "general") as "general" | "customer" | "contact" | "deal" | "lead" | "activity",
-        entityId: String(record.entityId || record.entity_id || ''),
-        uploadedBy: String(record.uploadedBy || record.uploaded_by || ''),
+        url: String(record.url || record.file_url || ""),
+        description: String(record.description || ""),
+        tags: Array.isArray(record.tags) ? (record.tags as string[]) : [],
+        entityType: (record.entityType || record.entity_type || "general") as
+          | "general"
+          | "customer"
+          | "contact"
+          | "deal"
+          | "lead"
+          | "activity",
+        entityId: String(record.entityId || record.entity_id || ""),
+        uploadedBy: String(record.uploadedBy || record.uploaded_by || ""),
         isPublic: record.isPublic !== false,
       };
 
@@ -1113,8 +1188,7 @@ export class DrizzlePqliteImportExportService implements ImportExportService {
       }
       case "contacts": {
         const query = this.createDefaultQuery(filters);
-        const contactResult =
-          await this.context.contactRepository.list(query);
+        const contactResult = await this.context.contactRepository.list(query);
         return contactResult.isOk() ? contactResult.value.items : [];
       }
       case "leads": {

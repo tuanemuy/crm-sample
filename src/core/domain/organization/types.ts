@@ -245,7 +245,9 @@ export const listOrganizationsQuerySchema = z.object({
     .optional(),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
-export type ListOrganizationsQuery = z.infer<typeof listOrganizationsQuerySchema>;
+export type ListOrganizationsQuery = z.infer<
+  typeof listOrganizationsQuerySchema
+>;
 
 export const listDepartmentsQuerySchema = z.object({
   organizationId: z.string().uuid(),

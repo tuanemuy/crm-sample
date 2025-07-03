@@ -1,4 +1,14 @@
-import { and, count, desc, eq, gte, ilike, lte, sql, type SQL } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gte,
+  ilike,
+  lte,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import { err, ok, type Result } from "neverthrow";
 import type { SecurityRepository } from "@/core/domain/security/ports/securityRepository";
 import type {

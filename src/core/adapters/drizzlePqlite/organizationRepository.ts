@@ -7,6 +7,7 @@ import type {
   Department,
   DepartmentWithHierarchy,
   ListDepartmentsQuery,
+  ListOrganizationsQuery,
   Organization,
   OrganizationAnalytics,
   UpdateDepartmentParams,
@@ -135,6 +136,46 @@ export class DrizzlePqliteOrganizationRepository
       return ok(undefined);
     } catch (error) {
       return err(new RepositoryError("Failed to delete organization", error));
+    }
+  }
+
+  async listOrganizations(
+    query: ListOrganizationsQuery,
+  ): Promise<Result<{ items: Organization[]; count: number }, RepositoryError>> {
+    const { pagination, filter, sortOrder } = query;
+    const limit = pagination.limit;
+    const offset = (pagination.page - 1) * pagination.limit;
+
+    const filters = [
+      filter?.keyword ? like(organizations.name, `%${filter.keyword}%`) : undefined,
+      filter?.industry ? eq(organizations.industry, filter.industry) : undefined,
+      filter?.size ? eq(organizations.size, filter.size) : undefined,
+      filter?.isActive !== undefined ? eq(organizations.isActive, filter.isActive) : undefined,
+    ].filter((filter) => filter !== undefined);
+
+    try {
+      const [items, countResult] = await Promise.all([
+        this.db
+          .select()
+          .from(organizations)
+          .where(and(...filters))
+          .orderBy(sortOrder === "asc" ? organizations.createdAt : desc(organizations.createdAt))
+          .limit(limit)
+          .offset(offset),
+        this.db
+          .select({ count: sql`count(*)` })
+          .from(organizations)
+          .where(and(...filters)),
+      ]);
+
+      return ok({
+        items: items
+          .map((item) => validate(organizationSchema, item).unwrapOr(null))
+          .filter((item) => item !== null),
+        count: Number(countResult[0].count),
+      });
+    } catch (error) {
+      return err(new RepositoryError("Failed to list organizations", error));
     }
   }
 

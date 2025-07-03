@@ -233,6 +233,20 @@ export const updateDepartmentSchema = z.object({
 export type UpdateDepartmentParams = z.infer<typeof updateDepartmentSchema>;
 
 // Query types
+export const listOrganizationsQuerySchema = z.object({
+  pagination: paginationSchema,
+  filter: z
+    .object({
+      keyword: z.string().optional(),
+      industry: z.string().optional(),
+      size: z.enum(["small", "medium", "large", "enterprise"]).optional(),
+      isActive: z.boolean().optional(),
+    })
+    .optional(),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+});
+export type ListOrganizationsQuery = z.infer<typeof listOrganizationsQuerySchema>;
+
 export const listDepartmentsQuerySchema = z.object({
   organizationId: z.string().uuid(),
   pagination: paginationSchema,

@@ -10,7 +10,7 @@
 
 - 実装が設計に従っているか確認する
 - コードの品質をレビューする
-- `logs/${yyyyMMddHHmm}_review_backend.md` を更新する
+- `logs/$(date "+%Y%m%d%H%M)_review_backend.md` を更新する
 
 ## 備考
 

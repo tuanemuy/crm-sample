@@ -133,7 +133,7 @@ export class DrizzlePqliteIntegrationService implements IntegrationService {
         "Content-Type": "application/json",
       };
       if (apiKey) {
-        headers["Authorization"] = `Bearer ${apiKey}`;
+        headers.Authorization = `Bearer ${apiKey}`;
       }
 
       const response = await fetch(endpoint, { headers });

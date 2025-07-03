@@ -6,6 +6,7 @@ import type {
   Department,
   DepartmentWithHierarchy,
   ListDepartmentsQuery,
+  ListOrganizationsQuery,
   Organization,
   OrganizationAnalytics,
   UpdateDepartmentParams,
@@ -25,6 +26,9 @@ export interface OrganizationRepository {
     id: string,
   ): Promise<Result<Organization | null, RepositoryError>>;
   deleteOrganization(id: string): Promise<Result<void, RepositoryError>>;
+  listOrganizations(
+    query: ListOrganizationsQuery,
+  ): Promise<Result<{ items: Organization[]; count: number }, RepositoryError>>;
 
   // Organization settings
   updateOrganizationSettings(

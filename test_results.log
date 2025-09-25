@@ -1,0 +1,211 @@
+
+> crm-sample@0.1.0 test /home/hikaru/agent/github.com/tuanemuy/crm-sample
+> vitest run --poolOptions.threads.singleThread
+
+
+ RUN  v3.2.4 /home/hikaru/agent/github.com/tuanemuy/crm-sample
+
+ ❯ src/core/application/integration/testIntegration.test.ts (30 tests | 4 failed) 65342ms
+   ✓ testIntegration > Input Validation > should reject integration test with invalid UUID  4486ms
+   ✓ testIntegration > Input Validation > should reject integration test with empty ID  2544ms
+   ✓ testIntegration > Integration Not Found > should return NotFoundError when integration does not exist  2163ms
+   ✓ testIntegration > Successful Integration Testing > should test webhook integration successfully  2028ms
+   ✓ testIntegration > Successful Integration Testing > should test API integration successfully  2648ms
+   ✓ testIntegration > Successful Integration Testing > should test email integration successfully  1841ms
+   ✓ testIntegration > Successful Integration Testing > should test integration with complex configuration  1867ms
+   × testIntegration > Integration Test Failures > should handle integration test failure and update status to error 1828ms
+     → expected false to be true // Object.is equality
+   × testIntegration > Integration Test Failures > should handle webhook integration test failure 2200ms
+     → expected false to be true // Object.is equality
+   × testIntegration > Integration Test Failures > should handle email integration test failure 2447ms
+     → expected false to be true // Object.is equality
+   ✓ testIntegration > Integration Types Coverage > should test email integration  1937ms
+   ✓ testIntegration > Integration Types Coverage > should test calendar integration  2218ms
+   ✓ testIntegration > Integration Types Coverage > should test slack integration  2089ms
+   ✓ testIntegration > Integration Types Coverage > should test teams integration  1942ms
+   ✓ testIntegration > Integration Types Coverage > should test salesforce integration  1986ms
+   ✓ testIntegration > Integration Types Coverage > should test hubspot integration  1823ms
+   ✓ testIntegration > Integration Types Coverage > should test zapier integration  2074ms
+   ✓ testIntegration > Integration Types Coverage > should test webhook integration  1980ms
+   ✓ testIntegration > Integration Types Coverage > should test api integration  1849ms
+   ✓ testIntegration > Integration Types Coverage > should test database integration  2177ms
+   ✓ testIntegration > Integration Types Coverage > should test file_storage integration  1924ms
+   ✓ testIntegration > Integration Types Coverage > should test payment_gateway integration  2006ms
+   ✓ testIntegration > Integration Types Coverage > should test analytics integration  2014ms
+   ✓ testIntegration > Integration Types Coverage > should test social_media integration  2157ms
+   ✓ testIntegration > Status Transition Testing > should transition from error to active on successful test  2262ms
+   × testIntegration > Status Transition Testing > should transition from active to error on failed test 2126ms
+     → expected 'Failed to get integration' to be 'Integration test failed' // Object.is equality
+   ✓ testIntegration > Edge Cases > should handle testing integration with minimal configuration  2135ms
+   ✓ testIntegration > Edge Cases > should handle testing system-wide integration  1957ms
+   ✓ testIntegration > Edge Cases > should handle testing user-specific integration  2676ms
+   ✓ testIntegration > Edge Cases > should handle testing disabled integration  1952ms
+ ❯ src/core/application/lead/searchLeads.test.ts (30 tests | 7 failed) 67454ms
+   ✓ searchLeads > input validation > should validate keyword requirements  4726ms
+   ✓ searchLeads > input validation > should validate pagination parameters  2657ms
+   ✓ searchLeads > input validation > should validate filter parameters  1993ms
+   ✓ searchLeads > input validation > should validate sort parameters  2611ms
+   ✓ searchLeads > input validation > should accept valid input parameters  2152ms
+   ✓ searchLeads > empty result handling > should return empty list when no leads match keyword  1628ms
+   ✓ searchLeads > empty result handling > should return empty list when no leads exist  2096ms
+   × searchLeads > keyword searching > should search leads by first name 2140ms
+     → expected [ { …(18) }, { …(18) } ] to have a length of 1 but got 2
+   ✓ searchLeads > keyword searching > should search leads by last name  2026ms
+   ✓ searchLeads > keyword searching > should search leads by email  2234ms
+   ✓ searchLeads > keyword searching > should search leads by company  2133ms
+   ✓ searchLeads > keyword searching > should search leads by multiple matching fields  2217ms
+   ✓ searchLeads > keyword searching > should perform case-insensitive search  2068ms
+   ✓ searchLeads > keyword searching > should search with partial matches  2210ms
+   × searchLeads > filtering > should filter by status 1902ms
+     → expected [ { …(18) }, { …(18) }, { …(18) } ] to have a length of 1 but got 3
+   × searchLeads > filtering > should filter by score range 1959ms
+     → expected [ { …(18) }, { …(18) }, { …(18) } ] to have a length of 1 but got 3
+   × searchLeads > filtering > should filter by assigned user 2201ms
+     → expected [ { …(18) }, { …(18) }, { …(18) } ] to have a length of 1 but got 3
+   × searchLeads > filtering > should filter by tags 1988ms
+     → expected [ { …(18) }, { …(18) }, { …(18) } ] to have a length of 1 but got 3
+   × searchLeads > filtering > should filter by multiple criteria 2006ms
+     → expected [ { …(18) }, { …(18) }, { …(18) } ] to have a length of 1 but got 3
+   ✓ searchLeads > sorting > should sort by first name ascending  1793ms
+   ✓ searchLeads > sorting > should sort by score descending  2100ms
+   ✓ searchLeads > sorting > should use default sorting when not specified  2256ms
+   ✓ searchLeads > pagination > should paginate results  2314ms
+   ✓ searchLeads > pagination > should handle second page requests  2022ms
+   ✓ searchLeads > pagination > should use default pagination when not specified  2579ms
+   × searchLeads > edge cases > should handle special characters in keyword 2302ms
+     → expected [] to have a length of 1 but got +0
+   ✓ searchLeads > edge cases > should handle numeric keywords  1942ms
+   ✓ searchLeads > edge cases > should handle whitespace in keyword  2059ms
+   ✓ searchLeads > edge cases > should handle empty filter values  2305ms
+   ✓ searchLeads > repository error handling > should handle repository failure gracefully  2821ms
+ ✓ src/core/application/customer/createCustomer.boundary.test.ts (44 tests) 92621ms
+   ✓ createCustomer - Boundary Value Tests > Name Boundary Values > should reject customer with empty name  4529ms
+   ✓ createCustomer - Boundary Value Tests > Name Boundary Values > should create customer with minimum name length (1 character)  2464ms
+   ✓ createCustomer - Boundary Value Tests > Name Boundary Values > should create customer with maximum name length (255 characters)  2142ms
+   ✓ createCustomer - Boundary Value Tests > Name Boundary Values > should reject customer with name exceeding maximum length (256 characters)  2266ms
+   ✓ createCustomer - Boundary Value Tests > Size Boundary Values > should create customer with small size  2315ms
+   ✓ createCustomer - Boundary Value Tests > Size Boundary Values > should create customer with medium size  1996ms
+   ✓ createCustomer - Boundary Value Tests > Size Boundary Values > should create customer with large size  1810ms
+   ✓ createCustomer - Boundary Value Tests > Size Boundary Values > should create customer with enterprise size  1794ms
+   ✓ createCustomer - Boundary Value Tests > Size Boundary Values > should create customer with startup size  1851ms
+   ✓ createCustomer - Boundary Value Tests > Size Boundary Values > should reject customer with invalid size  1757ms
+   ✓ createCustomer - Boundary Value Tests > Size Boundary Values > should create customer without size (optional field)  2069ms
+   ✓ createCustomer - Boundary Value Tests > Founded Year Boundary Values > should create customer with minimum founded year (1800)  1865ms
+   ✓ createCustomer - Boundary Value Tests > Founded Year Boundary Values > should create customer with current year  2462ms
+   ✓ createCustomer - Boundary Value Tests > Founded Year Boundary Values > should reject customer with founded year before 1800  2026ms
+   ✓ createCustomer - Boundary Value Tests > Founded Year Boundary Values > should reject customer with founded year in the future  2060ms
+   ✓ createCustomer - Boundary Value Tests > Founded Year Boundary Values > should reject customer with non-integer founded year  1832ms
+   ✓ createCustomer - Boundary Value Tests > Founded Year Boundary Values > should create customer without founded year (optional field)  2129ms
+   ✓ createCustomer - Boundary Value Tests > Website URL Boundary Values > should create customer with valid HTTP URL  2111ms
+   ✓ createCustomer - Boundary Value Tests > Website URL Boundary Values > should create customer with valid HTTPS URL  1745ms
+   ✓ createCustomer - Boundary Value Tests > Website URL Boundary Values > should create customer with complex URL  1992ms
+   ✓ createCustomer - Boundary Value Tests > Website URL Boundary Values > should create customer with URL containing port  1984ms
+   ✓ createCustomer - Boundary Value Tests > Website URL Boundary Values > should create customer with subdomain URL  2143ms
+   ✓ createCustomer - Boundary Value Tests > Website URL Boundary Values > should reject customer with invalid URL format  2311ms
+   ✓ createCustomer - Boundary Value Tests > Website URL Boundary Values > should reject customer with URL missing protocol  2076ms
+   ✓ createCustomer - Boundary Value Tests > Website URL Boundary Values > should create customer without website (optional field)  1831ms
+   ✓ createCustomer - Boundary Value Tests > User ID Boundary Values > should create customer with valid assigned user ID  1845ms
+   ✓ createCustomer - Boundary Value Tests > User ID Boundary Values > should create customer with valid parent customer ID  2098ms
+   ✓ createCustomer - Boundary Value Tests > User ID Boundary Values > should reject customer with invalid assigned user ID format  2185ms
+   ✓ createCustomer - Boundary Value Tests > User ID Boundary Values > should reject customer with invalid parent customer ID format  2334ms
+   ✓ createCustomer - Boundary Value Tests > User ID Boundary Values > should create customer without assigned user ID (optional field)  1740ms
+   ✓ createCustomer - Boundary Value Tests > User ID Boundary Values > should create customer without parent customer ID (optional field)  1971ms
+   ✓ createCustomer - Boundary Value Tests > Optional Text Fields Boundary Values > should create customer with all optional text fields provided  3158ms
+   ✓ createCustomer - Boundary Value Tests > Optional Text Fields Boundary Values > should create customer with very long optional text fields  2203ms
+   ✓ createCustomer - Boundary Value Tests > Optional Text Fields Boundary Values > should create customer with special characters in optional text fields  2245ms
+   ✓ createCustomer - Boundary Value Tests > Optional Text Fields Boundary Values > should create customer with empty optional text fields  1872ms
+   ✓ createCustomer - Boundary Value Tests > Optional Text Fields Boundary Values > should create customer without optional text fields  1985ms
+   ✓ createCustomer - Boundary Value Tests > Unicode and International Characters > should create customer with international characters in name  1916ms
+   ✓ createCustomer - Boundary Value Tests > Unicode and International Characters > should create customer with Chinese characters  1881ms
+   ✓ createCustomer - Boundary Value Tests > Unicode and International Characters > should create customer with Japanese characters  2012ms
+   ✓ createCustomer - Boundary Value Tests > Unicode and International Characters > should create customer with emoji characters  1880ms
+   ✓ createCustomer - Boundary Value Tests > Unicode and International Characters > should create customer with mixed script characters  2044ms
+   ✓ createCustomer - Boundary Value Tests > Edge Cases > should create customer with whitespace in name  1886ms
+   ✓ createCustomer - Boundary Value Tests > Edge Cases > should create customer with all fields at boundary values  2023ms
+   ✓ createCustomer - Boundary Value Tests > Edge Cases > should create customer with minimal required fields only  1776ms
+ ✓ src/core/application/integration/listIntegrations.test.ts (35 tests) 104538ms
+   ✓ listIntegrations > Success Cases > should list all integrations when no filter is provided  4514ms
+   ✓ listIntegrations > Success Cases > should list integrations without any input parameter  2241ms
+   ✓ listIntegrations > Success Cases > should return empty array when no integrations exist  2133ms
+   ✓ listIntegrations > Filtering > should filter integrations by type  2087ms
+   ✓ listIntegrations > Filtering > should filter integrations by webhook type  2841ms
+   ✓ listIntegrations > Filtering > should filter integrations by api type  1891ms
+   ✓ listIntegrations > Filtering > should filter integrations by isSystemwide = true  1942ms
+   ✓ listIntegrations > Filtering > should filter integrations by isSystemwide = false  1805ms
+   ✓ listIntegrations > Filtering > should return empty array when filtering by non-existent type  2083ms
+   ✓ listIntegrations > Filtering > should handle multiple filter criteria  2346ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type email  4307ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type calendar  4001ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type slack  3800ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type teams  3999ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type salesforce  3871ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type hubspot  4192ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type zapier  4095ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type webhook  4533ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type api  4085ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type database  4080ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type file_storage  4526ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type payment_gateway  4041ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type analytics  3928ms
+   ✓ listIntegrations > Integration Type Coverage > should filter integrations by type social_media  4255ms
+   ✓ listIntegrations > Status Filtering > should accept status filter active  2025ms
+   ✓ listIntegrations > Status Filtering > should accept status filter inactive  2084ms
+   ✓ listIntegrations > Status Filtering > should accept status filter error  1987ms
+   ✓ listIntegrations > Status Filtering > should accept status filter pending  2032ms
+   ✓ listIntegrations > Status Filtering > should accept status filter configured  1987ms
+   ✓ listIntegrations > Edge Cases > should handle empty filter object  1871ms
+   ✓ listIntegrations > Edge Cases > should handle filter with only status  2137ms
+   ✓ listIntegrations > Edge Cases > should handle filter with only isSystemwide  2435ms
+   ✓ listIntegrations > Edge Cases > should handle contradictory filter criteria  2469ms
+   ✓ listIntegrations > Large Dataset Handling > should handle listing many integrations  2099ms
+   ✓ listIntegrations > Large Dataset Handling > should handle filtering with many integrations  1811ms
+ ✓ src/core/application/activity/createActivity.boundary.test.ts (49 tests) 104913ms
+   ✓ createActivity - Boundary Value Tests > Subject Boundary Values > should reject activity with empty subject  4634ms
+   ✓ createActivity - Boundary Value Tests > Subject Boundary Values > should create activity with minimum subject length (1 character)  2518ms
+   ✓ createActivity - Boundary Value Tests > Subject Boundary Values > should create activity with maximum subject length (255 characters)  2006ms
+   ✓ createActivity - Boundary Value Tests > Subject Boundary Values > should reject activity with subject exceeding maximum length (256 characters)  2189ms
+   ✓ createActivity - Boundary Value Tests > Duration Boundary Values > should reject activity with zero duration  2471ms
+   ✓ createActivity - Boundary Value Tests > Duration Boundary Values > should reject activity with negative duration  1884ms
+   ✓ createActivity - Boundary Value Tests > Duration Boundary Values > should create activity with minimum duration (1 minute)  1958ms
+   ✓ createActivity - Boundary Value Tests > Duration Boundary Values > should create activity with large duration (24 hours)  2117ms
+   ✓ createActivity - Boundary Value Tests > Duration Boundary Values > should create activity without duration (optional field)  2028ms
+   ✓ createActivity - Boundary Value Tests > Activity Type Boundary Values > should create activity with type call  2075ms
+   ✓ createActivity - Boundary Value Tests > Activity Type Boundary Values > should create activity with type email  1717ms
+   ✓ createActivity - Boundary Value Tests > Activity Type Boundary Values > should create activity with type meeting  1991ms
+   ✓ createActivity - Boundary Value Tests > Activity Type Boundary Values > should create activity with type task  1870ms
+   ✓ createActivity - Boundary Value Tests > Activity Type Boundary Values > should create activity with type note  2004ms
+   ✓ createActivity - Boundary Value Tests > Activity Type Boundary Values > should reject activity with invalid type  1964ms
+   ✓ createActivity - Boundary Value Tests > Priority Boundary Values > should create activity with priority low  1908ms
+   ✓ createActivity - Boundary Value Tests > Priority Boundary Values > should create activity with priority medium  2131ms
+   ✓ createActivity - Boundary Value Tests > Priority Boundary Values > should create activity with priority high  2117ms
+   ✓ createActivity - Boundary Value Tests > Priority Boundary Values > should create activity with priority urgent  1949ms
+   ✓ createActivity - Boundary Value Tests > Priority Boundary Values > should default to medium priority when not specified  1930ms
+   ✓ createActivity - Boundary Value Tests > Priority Boundary Values > should reject activity with invalid priority  1810ms
+   ✓ createActivity - Boundary Value Tests > UUID Boundary Values > should reject activity with invalid assignedUserId UUID  1960ms
+   ✓ createActivity - Boundary Value Tests > UUID Boundary Values > should reject activity with invalid customerId UUID  2216ms
+   ✓ createActivity - Boundary Value Tests > UUID Boundary Values > should reject activity with invalid contactId UUID  1887ms
+   ✓ createActivity - Boundary Value Tests > UUID Boundary Values > should reject activity with invalid dealId UUID  1872ms
+   ✓ createActivity - Boundary Value Tests > UUID Boundary Values > should reject activity with invalid leadId UUID  1988ms
+   ✓ createActivity - Boundary Value Tests > UUID Boundary Values > should reject activity with non-existent assignedUserId  2383ms
+   ✓ createActivity - Boundary Value Tests > UUID Boundary Values > should reject activity with non-existent customerId  2244ms
+   ✓ createActivity - Boundary Value Tests > UUID Boundary Values > should reject activity with non-existent contactId  2427ms
+   ✓ createActivity - Boundary Value Tests > UUID Boundary Values > should reject activity with non-existent dealId  2292ms
+   ✓ createActivity - Boundary Value Tests > UUID Boundary Values > should reject activity with non-existent leadId  2229ms
+   ✓ createActivity - Boundary Value Tests > Date Boundary Values > should create activity with scheduled date in the future  2644ms
+   ✓ createActivity - Boundary Value Tests > Date Boundary Values > should create activity with scheduled date in the past  2092ms
+   ✓ createActivity - Boundary Value Tests > Date Boundary Values > should create activity with due date in the future  2276ms
+   ✓ createActivity - Boundary Value Tests > Date Boundary Values > should create activity with both scheduled and due dates  1836ms
+   ✓ createActivity - Boundary Value Tests > Date Boundary Values > should create activity without dates (optional fields)  2047ms
+   ✓ createActivity - Boundary Value Tests > Association Boundary Values > should create activity with valid customer association  1965ms
+   ✓ createActivity - Boundary Value Tests > Association Boundary Values > should create activity with valid contact association  2212ms
+   ✓ createActivity - Boundary Value Tests > Association Boundary Values > should create activity with valid deal association  1907ms
+   ✓ createActivity - Boundary Value Tests > Association Boundary Values > should create activity with valid lead association  1966ms
+   ✓ createActivity - Boundary Value Tests > Association Boundary Values > should create activity with multiple associations  2540ms
+   ✓ createActivity - Boundary Value Tests > Association Boundary Values > should create activity without any associations  2099ms
+   ✓ createActivity - Boundary Value Tests > Description Boundary Values > should create activity with empty description  1971ms
+   ✓ createActivity - Boundary Value Tests > Description Boundary Values > should create activity with long description  1875ms
+   ✓ createActivity - Boundary Value Tests > Description Boundary Values > should create activity with special characters in description  1971ms
+   ✓ createActivity - Boundary Value Tests > Description Boundary Values > should create activity without description (optional field)  2258ms
+   ✓ createActivity - Boundary Value Tests > Edge Cases > should create activity with all maximum values  2319ms
+   ✓ createActivity - Boundary Value Tests > Edge Cases > should create activity with all minimum values  2210ms
+   ✓ createActivity - Boundary Value Tests > Edge Cases > should create activity with mixed boundary values  1946ms

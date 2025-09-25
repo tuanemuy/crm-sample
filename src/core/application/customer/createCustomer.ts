@@ -1,5 +1,6 @@
 import { err, type Result } from "neverthrow";
 import type { Context } from "@/core/application/context";
+import { ERROR_MESSAGES } from "@/core/application/errors/messages";
 import {
   type CreateCustomerInput,
   type Customer,
@@ -17,7 +18,7 @@ export async function createCustomer(
   if (validationResult.isErr()) {
     return err(
       new ApplicationError(
-        "Invalid input for customer creation",
+        ERROR_MESSAGES.CUSTOMER_INVALID_INPUT,
         validationResult.error,
       ),
     );
@@ -39,7 +40,7 @@ export async function createCustomer(
   }
 
   if (existingCustomerResult.value !== null) {
-    return err(new ApplicationError("Customer with this name already exists"));
+    return err(new ApplicationError(ERROR_MESSAGES.CUSTOMER_NAME_DUPLICATE));
   }
 
   // If assigned user is provided, verify user exists
@@ -56,7 +57,9 @@ export async function createCustomer(
       );
     }
     if (userResult.value === null) {
-      return err(new ApplicationError("Assigned user does not exist"));
+      return err(
+        new ApplicationError(ERROR_MESSAGES.CUSTOMER_ASSIGNED_USER_NOT_FOUND),
+      );
     }
   }
 
@@ -74,7 +77,9 @@ export async function createCustomer(
       );
     }
     if (parentResult.value === null) {
-      return err(new ApplicationError("Parent customer does not exist"));
+      return err(
+        new ApplicationError(ERROR_MESSAGES.CUSTOMER_PARENT_NOT_FOUND),
+      );
     }
   }
 
@@ -85,6 +90,7 @@ export async function createCustomer(
   };
   const createResult = await context.customerRepository.create(createParams);
   return createResult.mapErr(
-    (error) => new ApplicationError("Failed to create customer", error),
+    (error) =>
+      new ApplicationError(ERROR_MESSAGES.CUSTOMER_CREATION_FAILED, error),
   );
 }

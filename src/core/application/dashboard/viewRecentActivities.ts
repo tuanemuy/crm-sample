@@ -66,9 +66,24 @@ export async function viewRecentActivities(
   context: Context,
   input: ViewRecentActivitiesInput,
 ): Promise<Result<RecentActivitiesSummary, ApplicationError>> {
+  // Validate input
+  const parseResult = viewRecentActivitiesInputSchema.safeParse(input);
+  if (!parseResult.success) {
+    return err(
+      new ApplicationError(
+        "Invalid query for viewing recent activities",
+        parseResult.error,
+      ),
+    );
+  }
+
+  const validatedInput = parseResult.data;
+
   // If userId is provided, verify user exists
-  if (input.userId) {
-    const userResult = await context.userRepository.findById(input.userId);
+  if (validatedInput.userId) {
+    const userResult = await context.userRepository.findById(
+      validatedInput.userId,
+    );
     if (userResult.isErr()) {
       return err(
         new ApplicationError("Failed to verify user", userResult.error),
@@ -82,22 +97,14 @@ export async function viewRecentActivities(
   // Calculate date range
   const endDate = new Date();
   const startDate = new Date();
-  startDate.setDate(startDate.getDate() - input.daysBack);
-
-  // Build filter
-  const statusFilter = input.includeCompleted
-    ? undefined
-    : (["planned", "in_progress"] as Array<
-        "planned" | "in_progress" | "completed" | "cancelled"
-      >);
+  startDate.setDate(startDate.getDate() - validatedInput.daysBack);
 
   // List recent activities
   const activitiesResult = await context.activityRepository.list({
-    pagination: input.pagination,
+    pagination: validatedInput.pagination,
     filter: {
-      assignedUserId: input.userId,
-      type: input.types?.[0], // Take first type if multiple provided
-      status: statusFilter?.[0], // Take first status if multiple provided
+      assignedUserId: validatedInput.userId,
+      type: validatedInput.types?.[0], // Take first type if multiple provided
       scheduledAfter: startDate,
       scheduledBefore: endDate,
     },
@@ -114,7 +121,15 @@ export async function viewRecentActivities(
     );
   }
 
-  const { items: activities, count } = activitiesResult.value;
+  let { items: activities, count } = activitiesResult.value;
+
+  // Filter out completed activities if not requested
+  if (!validatedInput.includeCompleted) {
+    activities = activities.filter(
+      (activity) => activity.status !== "completed",
+    );
+    count = activities.length;
+  }
 
   // Enrich activities with related entity information
   const enrichedActivities = await Promise.all(
@@ -214,13 +229,13 @@ export async function viewRecentActivities(
     })),
   };
 
-  const totalPages = Math.ceil(count / input.pagination.limit);
+  const totalPages = Math.ceil(count / validatedInput.pagination.limit);
 
   return ok({
     activities: enrichedActivities,
     pagination: {
-      page: input.pagination.page,
-      limit: input.pagination.limit,
+      page: validatedInput.pagination.page,
+      limit: validatedInput.pagination.limit,
       totalPages,
       totalItems: count,
     },

@@ -7,13 +7,17 @@ import {
   leadFilterSchema,
 } from "@/core/domain/lead/types";
 import { ApplicationError } from "@/lib/error";
-import { paginationSchema } from "@/lib/pagination";
 import { validate } from "@/lib/validation";
 
 // Search leads input schema
+const searchPaginationSchema = z.object({
+  page: z.number().int().positive(),
+  limit: z.number().int().positive().max(100),
+});
+
 export const searchLeadsInputSchema = z.object({
   keyword: z.string().min(1).max(100),
-  pagination: paginationSchema.optional(),
+  pagination: searchPaginationSchema.optional(),
   filter: leadFilterSchema.omit({ keyword: true }).optional(),
   sortBy: z
     .enum([
@@ -52,7 +56,7 @@ export async function searchLeads(
     pagination: validInput.pagination || {
       page: 1,
       limit: 20,
-      order: "desc",
+      order: validInput.sortOrder,
       orderBy: validInput.sortBy || "createdAt",
     },
     filter: {

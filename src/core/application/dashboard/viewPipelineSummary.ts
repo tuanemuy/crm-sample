@@ -2,6 +2,7 @@ import { err, ok, type Result } from "neverthrow";
 import { z } from "zod/v4";
 import type { Context } from "@/core/application/context";
 import { ApplicationError } from "@/lib/error";
+import { validate } from "@/lib/validation";
 
 // Input schema for viewing pipeline summary
 export const viewPipelineSummaryInputSchema = z.object({
@@ -97,9 +98,22 @@ export async function viewPipelineSummary(
   context: Context,
   input: ViewPipelineSummaryInput,
 ): Promise<Result<PipelineSummary, ApplicationError>> {
+  // Validate input
+  const validationResult = validate(viewPipelineSummaryInputSchema, input);
+  if (validationResult.isErr()) {
+    return err(
+      new ApplicationError(
+        "Invalid input for viewing pipeline summary",
+        validationResult.error,
+      ),
+    );
+  }
+
+  const validInput = validationResult.value;
+
   // If userId is provided, verify user exists
-  if (input.userId) {
-    const userResult = await context.userRepository.findById(input.userId);
+  if (validInput.userId) {
+    const userResult = await context.userRepository.findById(validInput.userId);
     if (userResult.isErr()) {
       return err(
         new ApplicationError("Failed to verify user", userResult.error),
@@ -112,7 +126,7 @@ export async function viewPipelineSummary(
 
   // Get pipeline data
   const pipelineResult = await context.dealRepository.getPipelineData(
-    input.userId,
+    validInput.userId,
   );
   if (pipelineResult.isErr()) {
     return err(
@@ -123,7 +137,7 @@ export async function viewPipelineSummary(
   const pipelineData = pipelineResult.value;
 
   // Get deal statistics
-  const statsResult = await context.dealRepository.getStats(input.userId);
+  const statsResult = await context.dealRepository.getStats(validInput.userId);
   if (statsResult.isErr()) {
     return err(
       new ApplicationError("Failed to get deal statistics", statsResult.error),

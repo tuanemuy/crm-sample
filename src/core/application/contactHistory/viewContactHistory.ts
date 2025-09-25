@@ -1,5 +1,6 @@
 import { err, ok, type Result } from "neverthrow";
 import type { Context } from "@/core/application/context";
+import { ERROR_MESSAGES } from "@/core/application/errors/messages";
 import {
   type ContactHistoryWithRelations,
   type ListContactHistoryQuery,
@@ -23,7 +24,7 @@ export async function viewContactHistory(
   if (validationResult.isErr()) {
     return err(
       new ApplicationError(
-        "Invalid query for viewing contact history",
+        ERROR_MESSAGES.CONTACT_HISTORY_INVALID_QUERY,
         validationResult.error,
       ),
     );
@@ -40,7 +41,9 @@ export async function viewContactHistory(
   }
 
   if (!customerResult.value) {
-    return err(new ApplicationError("Customer not found"));
+    return err(
+      new ApplicationError(ERROR_MESSAGES.CONTACT_HISTORY_CUSTOMER_NOT_FOUND),
+    );
   }
 
   // Get contact history for customer
@@ -51,7 +54,7 @@ export async function viewContactHistory(
   if (historyResult.isErr()) {
     return err(
       new ApplicationError(
-        "Failed to get contact history",
+        ERROR_MESSAGES.CONTACT_HISTORY_FETCH_FAILED,
         historyResult.error,
       ),
     );

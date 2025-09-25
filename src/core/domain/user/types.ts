@@ -9,7 +9,7 @@ export const userSchema = z.object({
   passwordHash: z.string(),
   role: z.enum(["admin", "manager", "user"]),
   isActive: z.boolean(),
-  lastLoginAt: z.date().optional(),
+  lastLoginAt: z.date().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -24,9 +24,17 @@ export type UserWithoutPassword = z.infer<typeof userWithoutPasswordSchema>;
 
 // User creation input schema
 export const createUserInputSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(1).max(255),
-  password: z.string().min(8).max(255),
+  email: z
+    .string()
+    .email({ message: "有効なメールアドレスを入力してください" }),
+  name: z
+    .string()
+    .min(1, { message: "ユーザー名は必須です" })
+    .max(255, { message: "ユーザー名は255文字以内で入力してください" }),
+  password: z
+    .string()
+    .min(8, { message: "パスワードは8文字以上で入力してください" })
+    .max(255, { message: "パスワードは255文字以内で入力してください" }),
   role: z.enum(["admin", "manager", "user"]).default("user"),
 });
 
@@ -38,6 +46,13 @@ export const updateUserInputSchema = createUserInputSchema.partial().extend({
 });
 
 export type UpdateUserInput = z.infer<typeof updateUserInputSchema>;
+
+// User update input with ID (for tests and utilities)
+export const updateUserInputWithIdSchema = updateUserInputSchema.extend({
+  id: z.string().uuid(),
+});
+
+export type UpdateUserInputWithId = z.infer<typeof updateUserInputWithIdSchema>;
 
 // User filter schema
 export const userFilterSchema = z.object({

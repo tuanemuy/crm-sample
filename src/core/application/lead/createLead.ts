@@ -1,5 +1,6 @@
 import { err, ok, type Result } from "neverthrow";
 import type { Context } from "@/core/application/context";
+import { ERROR_MESSAGES } from "@/core/application/errors/messages";
 import {
   type CreateLeadInput,
   createLeadInputSchema,
@@ -17,7 +18,7 @@ export async function createLead(
   if (validationResult.isErr()) {
     return err(
       new ApplicationError(
-        "Invalid input for lead creation",
+        ERROR_MESSAGES.LEAD_INVALID_INPUT,
         validationResult.error,
       ),
     );
@@ -40,7 +41,7 @@ export async function createLead(
     }
 
     if (existingLeadResult.value !== null) {
-      return err(new ApplicationError("Lead with this email already exists"));
+      return err(new ApplicationError(ERROR_MESSAGES.LEAD_EMAIL_DUPLICATE));
     }
   }
 
@@ -58,7 +59,7 @@ export async function createLead(
       );
     }
     if (userResult.value === null) {
-      return err(new ApplicationError("Assigned user does not exist"));
+      return err(new ApplicationError(ERROR_MESSAGES.LEAD_CREATION_FAILED));
     }
   }
 

@@ -30,7 +30,10 @@ export const createActivityInputSchema = z.object({
   type: z.enum(["call", "email", "meeting", "task", "note"]),
   subject: z.string().min(1).max(255),
   description: z.string().optional(),
-  priority: z.enum(["low", "medium", "high", "urgent"]).default("medium"),
+  priority: z
+    .enum(["low", "medium", "high", "urgent"])
+    .optional()
+    .default("medium"),
   scheduledAt: z.date().optional(),
   dueDate: z.date().optional(),
   duration: z.number().int().min(1).optional(),
@@ -56,25 +59,53 @@ export const updateActivityInputSchema = createActivityInputSchema
 export type UpdateActivityInput = z.infer<typeof updateActivityInputSchema>;
 
 // Activity filter schema
-export const activityFilterSchema = z.object({
-  keyword: z.string().optional(),
-  type: z.enum(["call", "email", "meeting", "task", "note"]).optional(),
-  status: z
-    .enum(["planned", "in_progress", "completed", "cancelled"])
-    .optional(),
-  priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
-  customerId: z.string().uuid().optional(),
-  dealId: z.string().uuid().optional(),
-  leadId: z.string().uuid().optional(),
-  assignedUserId: z.string().uuid().optional(),
-  createdByUserId: z.string().uuid().optional(),
-  scheduledAfter: z.date().optional(),
-  scheduledBefore: z.date().optional(),
-  dueAfter: z.date().optional(),
-  dueBefore: z.date().optional(),
-  completedAfter: z.date().optional(),
-  completedBefore: z.date().optional(),
-});
+export const activityFilterSchema = z
+  .object({
+    keyword: z.string().optional(),
+    type: z.enum(["call", "email", "meeting", "task", "note"]).optional(),
+    status: z
+      .enum(["planned", "in_progress", "completed", "cancelled"])
+      .optional(),
+    priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
+    customerId: z.string().uuid().optional(),
+    dealId: z.string().uuid().optional(),
+    leadId: z.string().uuid().optional(),
+    assignedUserId: z.string().uuid().optional(),
+    createdByUserId: z.string().uuid().optional(),
+    scheduledAfter: z.date().optional(),
+    scheduledBefore: z.date().optional(),
+    dueAfter: z.date().optional(),
+    dueBefore: z.date().optional(),
+    completedAfter: z.date().optional(),
+    completedBefore: z.date().optional(),
+  })
+  .refine(
+    (data) => {
+      // Validate scheduled date range
+      if (data.scheduledAfter && data.scheduledBefore) {
+        if (data.scheduledAfter > data.scheduledBefore) {
+          return false;
+        }
+      }
+      // Validate due date range
+      if (data.dueAfter && data.dueBefore) {
+        if (data.dueAfter > data.dueBefore) {
+          return false;
+        }
+      }
+      // Validate completed date range
+      if (data.completedAfter && data.completedBefore) {
+        if (data.completedAfter > data.completedBefore) {
+          return false;
+        }
+      }
+      return true;
+    },
+    {
+      message:
+        "Invalid date ranges: 'after' dates must be before or equal to 'before' dates",
+    },
+  );
 
 export type ActivityFilter = z.infer<typeof activityFilterSchema>;
 
@@ -174,7 +205,7 @@ export type ActivityWithRelations = z.infer<typeof activityWithRelationsSchema>;
 export const completeActivityInputSchema = z.object({
   completedAt: z.date().default(() => new Date()),
   duration: z.number().int().min(1).optional(),
-  notes: z.string().optional(),
+  notes: z.string().max(1000).optional(),
 });
 
 export type CompleteActivityInput = z.infer<typeof completeActivityInputSchema>;

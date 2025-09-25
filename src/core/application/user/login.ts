@@ -14,7 +14,9 @@ export async function login(
   context: Context,
   input: LoginInput,
 ): Promise<Result<UserWithoutPassword, ApplicationError>> {
-  const userResult = await context.userRepository.findByEmail(input.email);
+  const userResult = await context.userRepository.findByEmail(
+    input.email.toLowerCase(),
+  );
   if (userResult.isErr()) {
     return err(new ApplicationError("Failed to find user", userResult.error));
   }

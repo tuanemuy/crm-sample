@@ -10,7 +10,7 @@ export const notificationSchema = z.object({
   message: z.string(),
   metadata: z.record(z.string(), z.unknown()),
   isRead: z.boolean(),
-  readAt: z.date().optional(),
+  readAt: z.date().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

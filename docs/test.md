@@ -2,6 +2,7 @@
 
 - Use `pnpm test` for tests
 - Use in-memory PGlite database for testing (DrizzlePglite${entity}Repository is available by passing `"memory://"` to `getDatabase`)
+- User `src/core/adapters/drizzlePglite/migrate.ts` to run migrations for the in-memory database
 - Use `src/core/adapters/mock/${adapter}.ts` to create mock implementations of external services for testing
 
 ## Application Service Tests

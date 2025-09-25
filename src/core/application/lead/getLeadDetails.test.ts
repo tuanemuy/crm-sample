@@ -1,532 +1,363 @@
-import { err, ok } from "neverthrow";
 import { v7 as uuidv7 } from "uuid";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import type { Database } from "@/core/adapters/drizzlePglite/client";
+import {
+  createTestContext,
+  setupTestDatabase,
+} from "@/core/adapters/drizzlePglite/testUtils";
 import type { Context } from "@/core/application/context";
-import type { LeadWithUser } from "@/core/domain/lead/types";
-import { ApplicationError, NotFoundError, RepositoryError } from "@/lib/error";
+import { ApplicationError, NotFoundError } from "@/lib/error";
 import { getLeadDetails } from "./getLeadDetails";
 
-// Mock repositories
-const mockLeadRepository = {
-  create: vi.fn(),
-  findById: vi.fn(),
-  findByIdWithUser: vi.fn(),
-  list: vi.fn(),
-  update: vi.fn(),
-  delete: vi.fn(),
-  findByEmail: vi.fn(),
-  findByAssignedUser: vi.fn(),
-  search: vi.fn(),
-  updateScore: vi.fn(),
-  updateStatus: vi.fn(),
-  convert: vi.fn(),
-  getStats: vi.fn(),
-  createBehavior: vi.fn(),
-  getBehaviorByLeadId: vi.fn(),
-};
-
-// Mock context with minimal required repositories
-const mockContext: Context = {
-  leadRepository: mockLeadRepository,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  userRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  customerRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  contactRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  contactHistoryRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  dealRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  activityRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  notificationRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  organizationRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  permissionRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  proposalRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  reportRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  scoringRuleRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  scoringService: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  documentRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  storageManager: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  campaignRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  emailMarketingRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  approvalRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  securityRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  displaySettingsRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  dashboardRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  integrationRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  integrationService: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  importExportRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  importExportService: {} as any,
-};
+let db: Database;
+let context: Context;
 
 describe("getLeadDetails", () => {
-  beforeEach(() => {
-    // Reset all mocks
-    vi.clearAllMocks();
+  beforeEach(async () => {
+    db = await setupTestDatabase();
+    context = createTestContext(db);
   });
 
-  describe("lead not found", () => {
-    it("should return NotFoundError when lead does not exist", async () => {
-      const leadId = uuidv7();
+  describe("input validation", () => {
+    it("should reject empty leadId", async () => {
+      const result = await getLeadDetails(context, "");
 
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(null));
+      expect(result.isErr()).toBe(true);
+      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
+    });
 
-      const result = await getLeadDetails(mockContext, leadId);
+    it("should reject undefined leadId", async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+      const result = await getLeadDetails(context, undefined as any);
+
+      expect(result.isErr()).toBe(true);
+      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
+    });
+
+    it("should reject null leadId", async () => {
+      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+      const result = await getLeadDetails(context, null as any);
+
+      expect(result.isErr()).toBe(true);
+      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
+    });
+  });
+
+  describe("business logic validation", () => {
+    it("should return error for non-existent lead", async () => {
+      const nonExistentLeadId = uuidv7();
+
+      const result = await getLeadDetails(context, nonExistentLeadId);
 
       expect(result.isErr()).toBe(true);
       expect(result._unsafeUnwrapErr()).toBeInstanceOf(NotFoundError);
       expect(result._unsafeUnwrapErr().message).toBe("Lead not found");
-      expect(mockLeadRepository.findByIdWithUser).toHaveBeenCalledWith(leadId);
-    });
-  });
-
-  describe("repository error handling", () => {
-    it("should handle repository error when getting lead details", async () => {
-      const leadId = uuidv7();
-
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(
-        err(new RepositoryError("Database error")),
-      );
-
-      const result = await getLeadDetails(mockContext, leadId);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain(
-        "Failed to get lead details",
-      );
-    });
-
-    it("should handle database connection error", async () => {
-      const leadId = uuidv7();
-
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(
-        err(new RepositoryError("Database connection failed")),
-      );
-
-      const result = await getLeadDetails(mockContext, leadId);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain(
-        "Failed to get lead details",
-      );
-    });
-
-    it("should handle permission denied error", async () => {
-      const leadId = uuidv7();
-
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(
-        err(new RepositoryError("Access denied")),
-      );
-
-      const result = await getLeadDetails(mockContext, leadId);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain(
-        "Failed to get lead details",
-      );
     });
   });
 
   describe("successful retrieval", () => {
-    it("should return lead details with minimal data", async () => {
-      const leadId = uuidv7();
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
+    it("should return lead details for existing lead", async () => {
+      // Create a lead
+      const leadResult = await context.leadRepository.create({
         firstName: "John",
         lastName: "Doe",
         email: "john.doe@example.com",
-        status: "new",
-        score: 0,
-        tags: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
-
-      const result = await getLeadDetails(mockContext, leadId);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(leadWithUser);
-      expect(mockLeadRepository.findByIdWithUser).toHaveBeenCalledWith(leadId);
-    });
-
-    it("should return lead details with complete information", async () => {
-      const leadId = uuidv7();
-      const assignedUserId = uuidv7();
-      const convertedCustomerId = uuidv7();
-
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@example.com",
-        phone: "+1234567890",
-        company: "Example Corp",
+        phone: "123-456-7890",
+        company: "Test Company",
         title: "Manager",
-        industry: "Technology",
-        source: "Website",
-        status: "qualified",
-        score: 85,
-        tags: ["hot-lead", "enterprise"],
-        notes: "Very interested in our premium package",
-        assignedUserId,
-        convertedCustomerId,
-        convertedAt: new Date("2023-06-01"),
-        createdAt: new Date("2023-01-01"),
-        updatedAt: new Date("2023-06-01"),
-        assignedUser: {
-          id: assignedUserId,
-          name: "Sales Manager",
-          email: "sales@example.com",
-        },
-        convertedCustomer: {
-          id: convertedCustomerId,
-          name: "Example Corp",
-        },
-      };
+        source: "website",
+        status: "new",
+        score: 75,
+        tags: [],
+      });
+      expect(leadResult.isOk()).toBe(true);
+      const lead = leadResult._unsafeUnwrap();
 
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
-
-      const result = await getLeadDetails(mockContext, leadId);
+      const result = await getLeadDetails(context, lead.id);
 
       expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(leadWithUser);
-      expect(mockLeadRepository.findByIdWithUser).toHaveBeenCalledWith(leadId);
+      const leadDetails = result._unsafeUnwrap();
+
+      expect(leadDetails).toHaveProperty("id");
+      expect(leadDetails).toHaveProperty("firstName");
+      expect(leadDetails).toHaveProperty("lastName");
+      expect(leadDetails).toHaveProperty("email");
+      expect(leadDetails).toHaveProperty("phone");
+      expect(leadDetails).toHaveProperty("company");
+      expect(leadDetails).toHaveProperty("title");
+      expect(leadDetails).toHaveProperty("source");
+      expect(leadDetails).toHaveProperty("status");
+      expect(leadDetails).toHaveProperty("score");
+
+      expect(leadDetails.id).toBe(lead.id);
+      expect(leadDetails.firstName).toBe("John");
+      expect(leadDetails.lastName).toBe("Doe");
+      expect(leadDetails.email).toBe("john.doe@example.com");
+      expect(leadDetails.phone).toBe("123-456-7890");
+      expect(leadDetails.company).toBe("Test Company");
+      expect(leadDetails.title).toBe("Manager");
+      expect(leadDetails.source).toBe("website");
+      expect(leadDetails.status).toBe("new");
+      expect(leadDetails.score).toBe(75);
     });
 
-    it("should return lead without assigned user", async () => {
-      const leadId = uuidv7();
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
+    it("should return lead with assigned user information", async () => {
+      // Create a user first
+      const userResult = await context.userRepository.create({
+        name: "Test User",
+        email: "user@example.com",
+        role: "user",
+        isActive: true,
+        passwordHash: "hash",
+      });
+      expect(userResult.isOk()).toBe(true);
+      const user = userResult._unsafeUnwrap();
+
+      // Create a lead with assigned user
+      const leadResult = await context.leadRepository.create({
         firstName: "Jane",
         lastName: "Smith",
         email: "jane.smith@example.com",
-        status: "new",
-        score: 50,
-        tags: ["inbound"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        // assignedUser is undefined
-        // convertedCustomer is undefined
-      };
+        phone: "987-654-3210",
+        company: "Another Company",
+        title: "Director",
+        source: "referral",
+        status: "qualified",
+        score: 90,
+        assignedUserId: user.id,
+        tags: [],
+      });
+      expect(leadResult.isOk()).toBe(true);
+      const lead = leadResult._unsafeUnwrap();
 
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
-
-      const result = await getLeadDetails(mockContext, leadId);
+      const result = await getLeadDetails(context, lead.id);
 
       expect(result.isOk()).toBe(true);
-      const lead = result._unsafeUnwrap();
-      expect(lead.assignedUser).toBeUndefined();
-      expect(lead.convertedCustomer).toBeUndefined();
+      const leadDetails = result._unsafeUnwrap();
+
+      expect(leadDetails.id).toBe(lead.id);
+      expect(leadDetails.firstName).toBe("Jane");
+      expect(leadDetails.lastName).toBe("Smith");
+      expect(leadDetails.email).toBe("jane.smith@example.com");
+      expect(leadDetails.assignedUserId).toBe(user.id);
+    });
+  });
+
+  describe("data structure validation", () => {
+    it("should return lead with proper structure", async () => {
+      // Create a lead
+      const leadResult = await context.leadRepository.create({
+        firstName: "John",
+        lastName: "Doe",
+        email: "john.doe@example.com",
+        phone: "123-456-7890",
+        company: "Test Company",
+        title: "Manager",
+        source: "website",
+        status: "new",
+        score: 75,
+        tags: [],
+      });
+      expect(leadResult.isOk()).toBe(true);
+      const lead = leadResult._unsafeUnwrap();
+
+      const result = await getLeadDetails(context, lead.id);
+
+      expect(result.isOk()).toBe(true);
+      const leadDetails = result._unsafeUnwrap();
+
+      // Check core fields
+      expect(typeof leadDetails.id).toBe("string");
+      expect(typeof leadDetails.firstName).toBe("string");
+      expect(typeof leadDetails.lastName).toBe("string");
+      expect(typeof leadDetails.email).toBe("string");
+      expect(typeof leadDetails.phone).toBe("string");
+      expect(typeof leadDetails.company).toBe("string");
+      expect(typeof leadDetails.title).toBe("string");
+      expect(typeof leadDetails.source).toBe("string");
+      expect(typeof leadDetails.status).toBe("string");
+      expect(typeof leadDetails.score).toBe("number");
+
+      // Check timestamps
+      expect(leadDetails.createdAt).toBeInstanceOf(Date);
+      expect(leadDetails.updatedAt).toBeInstanceOf(Date);
+
+      // Check optional fields
+      if (leadDetails.assignedUserId) {
+        expect(typeof leadDetails.assignedUserId).toBe("string");
+      }
+      if (leadDetails.notes) {
+        expect(typeof leadDetails.notes).toBe("string");
+      }
     });
 
-    it("should handle all lead statuses", async () => {
-      const statuses: Array<
-        "new" | "contacted" | "qualified" | "converted" | "rejected"
-      > = ["new", "contacted", "qualified", "converted", "rejected"];
+    it("should handle leads with all optional fields", async () => {
+      // Create a user first
+      const userResult = await context.userRepository.create({
+        name: "Test User",
+        email: "user@example.com",
+        role: "user",
+        isActive: true,
+        passwordHash: "hash",
+      });
+      expect(userResult.isOk()).toBe(true);
+      const user = userResult._unsafeUnwrap();
 
-      for (const status of statuses) {
-        const leadId = uuidv7();
-        const leadWithUser: LeadWithUser = {
-          id: leadId,
-          firstName: "Test",
-          lastName: "Lead",
-          email: `test.${status}@example.com`,
-          status,
-          score: 75,
-          tags: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
+      // Create a lead with all optional fields
+      const leadResult = await context.leadRepository.create({
+        firstName: "Complete",
+        lastName: "Lead",
+        email: "complete@example.com",
+        phone: "555-1234",
+        company: "Complete Company",
+        title: "CEO",
+        source: "email",
+        status: "qualified",
+        score: 95,
+        assignedUserId: user.id,
+        notes: "This is a complete lead with all fields",
+        industry: "Technology",
+        tags: [],
+      });
+      expect(leadResult.isOk()).toBe(true);
+      const lead = leadResult._unsafeUnwrap();
 
-        mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
+      const result = await getLeadDetails(context, lead.id);
 
-        const result = await getLeadDetails(mockContext, leadId);
+      expect(result.isOk()).toBe(true);
+      const leadDetails = result._unsafeUnwrap();
 
-        expect(result.isOk()).toBe(true);
-        expect(result._unsafeUnwrap().status).toBe(status);
-      }
+      expect(leadDetails.firstName).toBe("Complete");
+      expect(leadDetails.lastName).toBe("Lead");
+      expect(leadDetails.email).toBe("complete@example.com");
+      expect(leadDetails.assignedUserId).toBe(user.id);
+      expect(leadDetails.notes).toBe("This is a complete lead with all fields");
     });
   });
 
   describe("edge cases", () => {
-    it("should handle lead with empty optional fields", async () => {
-      const leadId = uuidv7();
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
-        firstName: "Minimal",
+    it("should handle lead with minimal required fields", async () => {
+      // Create a lead with minimal fields
+      const leadResult = await context.leadRepository.create({
+        firstName: "Min",
         lastName: "Lead",
+        email: "min@example.com",
+        company: "Min Company",
+        source: "other",
         status: "new",
         score: 0,
         tags: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        // All optional fields are undefined
-        email: undefined,
-        phone: undefined,
-        company: undefined,
-        title: undefined,
-        industry: undefined,
-        source: undefined,
-        notes: undefined,
-        assignedUserId: undefined,
-        convertedCustomerId: undefined,
-        convertedAt: undefined,
-      };
+      });
+      expect(leadResult.isOk()).toBe(true);
+      const lead = leadResult._unsafeUnwrap();
 
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
-
-      const result = await getLeadDetails(mockContext, leadId);
+      const result = await getLeadDetails(context, lead.id);
 
       expect(result.isOk()).toBe(true);
-      const lead = result._unsafeUnwrap();
-      expect(lead.email).toBeUndefined();
-      expect(lead.phone).toBeUndefined();
-      expect(lead.company).toBeUndefined();
-      expect(lead.title).toBeUndefined();
-      expect(lead.industry).toBeUndefined();
-      expect(lead.source).toBeUndefined();
-      expect(lead.notes).toBeUndefined();
-      expect(lead.assignedUserId).toBeUndefined();
-      expect(lead.convertedCustomerId).toBeUndefined();
-      expect(lead.convertedAt).toBeUndefined();
+      const leadDetails = result._unsafeUnwrap();
+
+      expect(leadDetails.firstName).toBe("Min");
+      expect(leadDetails.lastName).toBe("Lead");
+      expect(leadDetails.email).toBe("min@example.com");
+      expect(leadDetails.company).toBe("Min Company");
+      expect(leadDetails.source).toBe("other");
+      expect(leadDetails.status).toBe("new");
+      expect(leadDetails.score).toBe(0);
     });
 
-    it("should handle lead with maximum score", async () => {
-      const leadId = uuidv7();
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
-        firstName: "High",
-        lastName: "Score",
-        email: "high.score@example.com",
-        status: "qualified",
-        score: 100, // Maximum score
-        tags: ["hot-lead", "enterprise", "priority"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+    it("should handle various lead statuses", async () => {
+      const statuses = [
+        "new",
+        "contacted",
+        "qualified",
+        "rejected",
+        "converted",
+      ] as const;
 
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
+      for (const status of statuses) {
+        const leadResult = await context.leadRepository.create({
+          firstName: "Test",
+          lastName: `Lead ${status}`,
+          email: `test.${status}@example.com`,
+          company: "Test Company",
+          source: "website",
+          status,
+          score: 50,
+          tags: [],
+        });
+        expect(leadResult.isOk()).toBe(true);
+        const lead = leadResult._unsafeUnwrap();
 
-      const result = await getLeadDetails(mockContext, leadId);
+        const result = await getLeadDetails(context, lead.id);
 
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap().score).toBe(100);
+        expect(result.isOk()).toBe(true);
+        const leadDetails = result._unsafeUnwrap();
+
+        expect(leadDetails.status).toBe(status);
+        expect(leadDetails.lastName).toBe(`Lead ${status}`);
+      }
     });
 
-    it("should handle lead with minimum score", async () => {
-      const leadId = uuidv7();
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
-        firstName: "Low",
-        lastName: "Score",
-        email: "low.score@example.com",
-        status: "new",
-        score: 0, // Minimum score
-        tags: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+    it("should handle various lead sources", async () => {
+      const sources = [
+        "website",
+        "email",
+        "phone",
+        "referral",
+        "social",
+        "advertisement",
+        "other",
+      ];
 
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
+      for (const source of sources) {
+        const leadResult = await context.leadRepository.create({
+          firstName: "Test",
+          lastName: `Lead ${source}`,
+          email: `test.${source}@example.com`,
+          company: "Test Company",
+          source,
+          status: "new",
+          score: 50,
+          tags: [],
+        });
+        expect(leadResult.isOk()).toBe(true);
+        const lead = leadResult._unsafeUnwrap();
 
-      const result = await getLeadDetails(mockContext, leadId);
+        const result = await getLeadDetails(context, lead.id);
 
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap().score).toBe(0);
+        expect(result.isOk()).toBe(true);
+        const leadDetails = result._unsafeUnwrap();
+
+        expect(leadDetails.source).toBe(source);
+        expect(leadDetails.lastName).toBe(`Lead ${source}`);
+      }
     });
 
-    it("should handle lead with multiple tags", async () => {
-      const leadId = uuidv7();
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
-        firstName: "Tagged",
-        lastName: "Lead",
-        email: "tagged@example.com",
-        status: "contacted",
-        score: 60,
-        tags: ["inbound", "website", "demo-requested", "enterprise", "urgent"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+    it("should handle various score ranges", async () => {
+      const scores = [0, 25, 50, 75, 100];
 
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
+      for (const score of scores) {
+        const leadResult = await context.leadRepository.create({
+          firstName: "Test",
+          lastName: `Lead Score ${score}`,
+          email: `test.score${score}@example.com`,
+          company: "Test Company",
+          source: "website",
+          status: "new",
+          score,
+          tags: [],
+        });
+        expect(leadResult.isOk()).toBe(true);
+        const lead = leadResult._unsafeUnwrap();
 
-      const result = await getLeadDetails(mockContext, leadId);
+        const result = await getLeadDetails(context, lead.id);
 
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap().tags).toHaveLength(5);
-      expect(result._unsafeUnwrap().tags).toContain("inbound");
-      expect(result._unsafeUnwrap().tags).toContain("urgent");
-    });
+        expect(result.isOk()).toBe(true);
+        const leadDetails = result._unsafeUnwrap();
 
-    it("should handle lead with empty tags array", async () => {
-      const leadId = uuidv7();
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
-        firstName: "No",
-        lastName: "Tags",
-        email: "notags@example.com",
-        status: "new",
-        score: 25,
-        tags: [], // Empty tags array
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
-
-      const result = await getLeadDetails(mockContext, leadId);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap().tags).toEqual([]);
-    });
-
-    it("should handle lead with long notes", async () => {
-      const leadId = uuidv7();
-      const longNotes = "Very long notes ".repeat(100); // Create long text
-
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
-        firstName: "Detailed",
-        lastName: "Lead",
-        email: "detailed@example.com",
-        status: "qualified",
-        score: 80,
-        tags: ["detailed"],
-        notes: longNotes,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
-
-      const result = await getLeadDetails(mockContext, leadId);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap().notes).toBe(longNotes);
-    });
-
-    it("should handle converted lead with conversion data", async () => {
-      const leadId = uuidv7();
-      const convertedCustomerId = uuidv7();
-      const convertedAt = new Date("2023-06-15T10:30:00Z");
-
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
-        firstName: "Converted",
-        lastName: "Lead",
-        email: "converted@example.com",
-        status: "converted",
-        score: 95,
-        tags: ["converted", "success"],
-        convertedCustomerId,
-        convertedAt,
-        createdAt: new Date("2023-01-01"),
-        updatedAt: new Date("2023-06-15"),
-        convertedCustomer: {
-          id: convertedCustomerId,
-          name: "Converted Customer Corp",
-        },
-      };
-
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
-
-      const result = await getLeadDetails(mockContext, leadId);
-
-      expect(result.isOk()).toBe(true);
-      const lead = result._unsafeUnwrap();
-      expect(lead.status).toBe("converted");
-      expect(lead.convertedCustomerId).toBe(convertedCustomerId);
-      expect(lead.convertedAt).toEqual(convertedAt);
-      expect(lead.convertedCustomer?.name).toBe("Converted Customer Corp");
-    });
-
-    it("should handle lead with special characters in name fields", async () => {
-      const leadId = uuidv7();
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
-        firstName: "José",
-        lastName: "García-López",
-        email: "jose.garcia@example.com",
-        company: "Compañía Internacional",
-        title: "Gerente de Ventas",
-        industry: "Tecnología & Software",
-        status: "contacted",
-        score: 70,
-        tags: ["español", "international"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
-
-      const result = await getLeadDetails(mockContext, leadId);
-
-      expect(result.isOk()).toBe(true);
-      const lead = result._unsafeUnwrap();
-      expect(lead.firstName).toBe("José");
-      expect(lead.lastName).toBe("García-López");
-      expect(lead.company).toBe("Compañía Internacional");
-    });
-
-    it("should handle lead with assigned user but no converted customer", async () => {
-      const leadId = uuidv7();
-      const assignedUserId = uuidv7();
-
-      const leadWithUser: LeadWithUser = {
-        id: leadId,
-        firstName: "Assigned",
-        lastName: "Lead",
-        email: "assigned@example.com",
-        status: "qualified",
-        score: 85,
-        tags: ["assigned"],
-        assignedUserId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        assignedUser: {
-          id: assignedUserId,
-          name: "John Sales",
-          email: "john.sales@example.com",
-        },
-        // No convertedCustomer
-      };
-
-      mockLeadRepository.findByIdWithUser.mockResolvedValue(ok(leadWithUser));
-
-      const result = await getLeadDetails(mockContext, leadId);
-
-      expect(result.isOk()).toBe(true);
-      const lead = result._unsafeUnwrap();
-      expect(lead.assignedUser).toBeDefined();
-      expect(lead.assignedUser?.name).toBe("John Sales");
-      expect(lead.convertedCustomer).toBeUndefined();
+        expect(leadDetails.score).toBe(score);
+        expect(leadDetails.lastName).toBe(`Lead Score ${score}`);
+      }
     });
   });
 });

@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/master";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     systems.url = "github:nix-systems/default";
   };
 
@@ -18,14 +18,11 @@
       devShells = forEachSupportedSystem (pkgs: {
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
+            biome
             nodejs_22
             pnpm
-            vtsls
             tailwindcss-language-server
-            biome
-            jdk17
-            alloy6
-            tlaplus
+            vtsls
           ];
         };
       });

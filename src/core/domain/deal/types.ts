@@ -67,29 +67,62 @@ export const updateDealInputSchema = createDealInputSchema.partial().extend({
 export type UpdateDealInput = z.infer<typeof updateDealInputSchema>;
 
 // Deal filter schema
-export const dealFilterSchema = z.object({
-  keyword: z.string().optional(),
-  stage: z
-    .enum([
-      "prospecting",
-      "qualification",
-      "proposal",
-      "negotiation",
-      "closed_won",
-      "closed_lost",
-    ])
-    .optional(),
-  customerId: z.string().uuid().optional(),
-  assignedUserId: z.string().uuid().optional(),
-  minAmount: z.string().optional(),
-  maxAmount: z.string().optional(),
-  minProbability: z.number().int().min(0).max(100).optional(),
-  maxProbability: z.number().int().min(0).max(100).optional(),
-  expectedCloseBefore: z.date().optional(),
-  expectedCloseAfter: z.date().optional(),
-  createdAfter: z.date().optional(),
-  createdBefore: z.date().optional(),
-});
+export const dealFilterSchema = z
+  .object({
+    keyword: z.string().optional(),
+    stage: z
+      .enum([
+        "prospecting",
+        "qualification",
+        "proposal",
+        "negotiation",
+        "closed_won",
+        "closed_lost",
+      ])
+      .optional(),
+    customerId: z.string().uuid().optional(),
+    assignedUserId: z.string().uuid().optional(),
+    minAmount: z.string().optional(),
+    maxAmount: z.string().optional(),
+    minProbability: z.number().int().min(0).max(100).optional(),
+    maxProbability: z.number().int().min(0).max(100).optional(),
+    expectedCloseBefore: z.date().optional(),
+    expectedCloseAfter: z.date().optional(),
+    createdAfter: z.date().optional(),
+    createdBefore: z.date().optional(),
+  })
+  .refine(
+    (data) => {
+      // Validate amount range
+      if (data.minAmount && data.maxAmount) {
+        const min = Number.parseFloat(data.minAmount);
+        const max = Number.parseFloat(data.maxAmount);
+        if (min > max) {
+          return false;
+        }
+      }
+      // Validate probability range
+      if (
+        data.minProbability !== undefined &&
+        data.maxProbability !== undefined
+      ) {
+        if (data.minProbability > data.maxProbability) {
+          return false;
+        }
+      }
+      // Validate date range
+      if (data.expectedCloseAfter && data.expectedCloseBefore) {
+        if (data.expectedCloseAfter > data.expectedCloseBefore) {
+          return false;
+        }
+      }
+      return true;
+    },
+    {
+      message:
+        "Invalid filter ranges: min values must be less than or equal to max values",
+    },
+  );
 
 export type DealFilter = z.infer<typeof dealFilterSchema>;
 

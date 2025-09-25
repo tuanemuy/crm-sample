@@ -16,7 +16,7 @@ export function stringToDBOrder(str: string): DBOrder | undefined {
 
 export const paginationSchema = z.object({
   page: z.number().int().positive(),
-  limit: z.number().int().positive(),
+  limit: z.number().int().positive().max(1000),
   order: dbOrderSchema,
   orderBy: z.string(),
 });

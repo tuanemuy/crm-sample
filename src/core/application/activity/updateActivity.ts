@@ -1,4 +1,5 @@
 import { err, ok, type Result } from "neverthrow";
+import { z } from "zod/v4";
 import type { Context } from "@/core/application/context";
 import {
   type Activity,
@@ -13,6 +14,17 @@ export async function updateActivity(
   id: string,
   input: UpdateActivityInput,
 ): Promise<Result<Activity, ApplicationError>> {
+  // Validate ID
+  const idValidationResult = validate(z.string().uuid(), id);
+  if (idValidationResult.isErr()) {
+    return err(
+      new ApplicationError(
+        "Invalid input: activity ID must be a valid UUID",
+        idValidationResult.error,
+      ),
+    );
+  }
+
   // Validate input
   const validationResult = validate(updateActivityInputSchema, input);
   if (validationResult.isErr()) {

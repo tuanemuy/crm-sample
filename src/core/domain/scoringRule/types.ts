@@ -44,7 +44,7 @@ export const createScoringRuleInputSchema = z.object({
   description: z.string().optional(),
   condition: z.array(scoringConditionSchema).min(1),
   score: z.number().int().min(-100).max(100),
-  priority: z.number().int().min(1).max(1000).default(100),
+  priority: z.number().int().min(1).max(1000).optional().default(100),
   createdByUserId: z.string().uuid(),
 });
 

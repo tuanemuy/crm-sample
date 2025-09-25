@@ -58,7 +58,7 @@ export async function testIntegration(
 
   await context.integrationRepository.update(integration.id, {
     status: "active",
-    lastErrorMessage: undefined,
+    lastErrorMessage: null,
   });
 
   return ok(testResult.value);

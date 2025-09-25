@@ -45,6 +45,12 @@ export async function viewTodayActivities(
   context: Context,
   input: ViewTodayActivitiesInput,
 ): Promise<Result<TodayActivitiesSummary, ApplicationError>> {
+  // Validate input
+  const inputValidation = viewTodayActivitiesInputSchema.safeParse(input);
+  if (!inputValidation.success) {
+    return err(new ApplicationError("Invalid input", inputValidation.error));
+  }
+
   // Verify user exists
   const userResult = await context.userRepository.findById(input.userId);
   if (userResult.isErr()) {

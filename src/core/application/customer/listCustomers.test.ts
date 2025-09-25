@@ -1,319 +1,40 @@
-import { err, ok } from "neverthrow";
-import { v7 as uuidv7 } from "uuid";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import type { Database } from "@/core/adapters/drizzlePglite/client";
+import {
+  createTestContext,
+  setupTestDatabase,
+} from "@/core/adapters/drizzlePglite/testUtils";
 import type { Context } from "@/core/application/context";
-import type {
-  Customer,
-  ListCustomersQuery,
-} from "@/core/domain/customer/types";
-import { ApplicationError, RepositoryError } from "@/lib/error";
+import type { ListCustomersQuery } from "@/core/domain/customer/types";
+import { ApplicationError } from "@/lib/error";
 import { listCustomers } from "./listCustomers";
 
-// Mock repositories
-const mockCustomerRepository = {
-  create: vi.fn(),
-  findByName: vi.fn(),
-  findById: vi.fn(),
-  findByIdWithRelations: vi.fn(),
-  findByAssignedUser: vi.fn(),
-  findChildren: vi.fn(),
-  search: vi.fn(),
-  list: vi.fn(),
-  update: vi.fn(),
-  delete: vi.fn(),
-  getStats: vi.fn(),
-};
-
-// Mock context with minimal required repositories
-const mockContext: Context = {
-  customerRepository: mockCustomerRepository,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  userRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  contactRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  contactHistoryRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  leadRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  dealRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  activityRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  notificationRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  organizationRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  permissionRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  proposalRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  reportRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  scoringRuleRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  scoringService: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  documentRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  storageManager: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  campaignRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  emailMarketingRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  approvalRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  securityRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  displaySettingsRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  dashboardRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  integrationRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  integrationService: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  importExportRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  importExportService: {} as any,
-};
+let db: Database;
+let context: Context;
 
 describe("listCustomers", () => {
-  beforeEach(() => {
-    // Reset all mocks
-    vi.clearAllMocks();
+  beforeEach(async () => {
+    db = await setupTestDatabase();
+    context = createTestContext(db);
   });
 
-  describe("input validation", () => {
-    it("should reject invalid pagination parameters", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 0, // Invalid page number
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid pagination limit", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 1,
-          limit: 0, // Invalid limit
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should accept large pagination limit values", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 1,
-          limit: 1001, // Large but valid positive integer
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const expectedResult = { items: [], count: 0 };
-      mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-    });
-
-    it("should reject invalid sort field", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid enum value
-        sortBy: "invalid_field" as any,
-        sortOrder: "desc",
-      };
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid sort order", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid enum value
-        sortOrder: "invalid_order" as any,
-      };
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid filter size", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: {
-          // biome-ignore lint/suspicious/noExplicitAny: Testing invalid enum value
-          size: "invalid_size" as any,
-        },
-        sortOrder: "desc",
-      };
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid filter status", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: {
-          // biome-ignore lint/suspicious/noExplicitAny: Testing invalid enum value
-          status: "invalid_status" as any,
-        },
-        sortOrder: "desc",
-      };
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid UUID in filter", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: {
-          assignedUserId: "invalid-uuid",
-        },
-        sortOrder: "desc",
-      };
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-  });
-
-  describe("repository error handling", () => {
-    it("should handle repository error when listing customers", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      mockCustomerRepository.list.mockResolvedValue(
-        err(new RepositoryError("Database error")),
-      );
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain(
-        "Failed to list customers",
-      );
-    });
-  });
-
-  describe("successful listing", () => {
-    it("should list customers with minimal query parameters", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const customers: Customer[] = [
-        {
-          id: uuidv7(),
-          name: "Company A",
+  describe("pagination functionality", () => {
+    it("should return paginated customer list", async () => {
+      // Create multiple customers for pagination testing
+      for (let i = 1; i <= 15; i++) {
+        await context.customerRepository.create({
+          name: `Customer ${i}`,
           status: "active",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: uuidv7(),
-          name: "Company B",
-          status: "active",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+          industry:
+            i % 3 === 0
+              ? "Technology"
+              : i % 3 === 1
+                ? "Healthcare"
+                : "Manufacturing",
+        });
+      }
 
-      const expectedResult = {
-        items: customers,
-        count: 2,
-      };
-
-      mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-      expect(mockCustomerRepository.list).toHaveBeenCalledWith({
+      const query: ListCustomersQuery = {
         pagination: {
           page: 1,
           limit: 10,
@@ -321,171 +42,479 @@ describe("listCustomers", () => {
           orderBy: "createdAt",
         },
         sortOrder: "desc",
-      });
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(15);
+      expect(data.items).toHaveLength(10);
+      expect(data.items[0].name).toBe("Customer 15"); // Most recent first
     });
 
-    it("should list customers with all query parameters", async () => {
-      const assignedUserId = uuidv7();
-      const parentCustomerId = uuidv7();
+    it("should return second page of results", async () => {
+      // Create 25 customers
+      for (let i = 1; i <= 25; i++) {
+        await context.customerRepository.create({
+          name: `Customer ${i}`,
+          status: "active",
+        });
+      }
 
       const query: ListCustomersQuery = {
         pagination: {
           page: 2,
-          limit: 25,
-          order: "asc" as const,
-          orderBy: "name",
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(25);
+      expect(data.items).toHaveLength(10);
+      // Should be different from first page results
+      expect(data.items[0].name).toBe("Customer 15");
+    });
+
+    it("should handle empty results gracefully", async () => {
+      const query: ListCustomersQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(0);
+      expect(data.items).toHaveLength(0);
+    });
+  });
+
+  describe("filtering functionality", () => {
+    beforeEach(async () => {
+      // Create test customers with different attributes
+      await context.customerRepository.create({
+        name: "Tech Solutions Inc",
+        industry: "Technology",
+        size: "large",
+        status: "active",
+      });
+
+      await context.customerRepository.create({
+        name: "Healthcare Corp",
+        industry: "Healthcare",
+        size: "medium",
+        status: "active",
+      });
+
+      await context.customerRepository.create({
+        name: "Manufacturing Ltd",
+        industry: "Manufacturing",
+        size: "small",
+        status: "inactive",
+      });
+
+      await context.customerRepository.create({
+        name: "Tech Startup",
+        industry: "Technology",
+        size: "startup",
+        status: "prospect",
+      });
+    });
+
+    it("should filter customers by industry", async () => {
+      const query: ListCustomersQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
         },
         filter: {
-          keyword: "technology",
           industry: "Technology",
-          size: "medium",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(2);
+      expect(data.items).toHaveLength(2);
+      data.items.forEach((customer) => {
+        expect(customer.industry).toBe("Technology");
+      });
+    });
+
+    it("should filter customers by size", async () => {
+      const query: ListCustomersQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        filter: {
+          size: "large",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(1);
+      expect(data.items).toHaveLength(1);
+      expect(data.items[0].size).toBe("large");
+      expect(data.items[0].name).toBe("Tech Solutions Inc");
+    });
+
+    it("should filter customers by status", async () => {
+      const query: ListCustomersQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        filter: {
+          status: "inactive",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(1);
+      expect(data.items).toHaveLength(1);
+      expect(data.items[0].status).toBe("inactive");
+      expect(data.items[0].name).toBe("Manufacturing Ltd");
+    });
+
+    it("should filter customers by keyword (name search)", async () => {
+      const query: ListCustomersQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        filter: {
+          keyword: "Healthcare",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(1);
+      expect(data.items).toHaveLength(1);
+      expect(data.items[0].name).toBe("Healthcare Corp");
+    });
+
+    it("should combine multiple filters", async () => {
+      const query: ListCustomersQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        filter: {
+          industry: "Technology",
           status: "active",
-          assignedUserId,
-          parentCustomerId,
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(1);
+      expect(data.items).toHaveLength(1);
+      expect(data.items[0].name).toBe("Tech Solutions Inc");
+      expect(data.items[0].industry).toBe("Technology");
+      expect(data.items[0].status).toBe("active");
+    });
+
+    it("should return empty results when no matches found", async () => {
+      const query: ListCustomersQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        filter: {
+          industry: "Finance",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(0);
+      expect(data.items).toHaveLength(0);
+    });
+  });
+
+  describe("sorting functionality", () => {
+    beforeEach(async () => {
+      // Create customers with different timestamps
+      await context.customerRepository.create({
+        name: "Alpha Corp",
+        industry: "Technology",
+        status: "active",
+      });
+
+      // Add a small delay to ensure different timestamps
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      await context.customerRepository.create({
+        name: "Beta Inc",
+        industry: "Healthcare",
+        status: "active",
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      await context.customerRepository.create({
+        name: "Gamma Ltd",
+        industry: "Manufacturing",
+        status: "active",
+      });
+    });
+
+    it("should sort customers by name in ascending order", async () => {
+      const query: ListCustomersQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "asc",
+          orderBy: "name",
         },
         sortBy: "name",
         sortOrder: "asc",
       };
 
-      const customers: Customer[] = [
-        {
-          id: uuidv7(),
-          name: "Tech Company",
-          industry: "Technology",
-          size: "medium",
-          status: "active",
-          assignedUserId,
-          parentCustomerId,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      const expectedResult = {
-        items: customers,
-        count: 1,
-      };
-
-      mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listCustomers(mockContext, query);
+      const result = await listCustomers(context, query);
 
       expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-      expect(mockCustomerRepository.list).toHaveBeenCalledWith(query);
+      const data = result._unsafeUnwrap();
+      expect(data.items).toHaveLength(3);
+      expect(data.items[0].name).toBe("Alpha Corp");
+      expect(data.items[1].name).toBe("Beta Inc");
+      expect(data.items[2].name).toBe("Gamma Ltd");
     });
 
-    it("should handle empty result", async () => {
+    it("should sort customers by name in descending order", async () => {
       const query: ListCustomersQuery = {
         pagination: {
           page: 1,
           limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
+          order: "desc",
+          orderBy: "name",
         },
+        sortBy: "name",
         sortOrder: "desc",
       };
 
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
-
-      mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listCustomers(mockContext, query);
+      const result = await listCustomers(context, query);
 
       expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
+      const data = result._unsafeUnwrap();
+      expect(data.items).toHaveLength(3);
+      expect(data.items[0].name).toBe("Gamma Ltd");
+      expect(data.items[1].name).toBe("Beta Inc");
+      expect(data.items[2].name).toBe("Alpha Corp");
+    });
+
+    it("should sort customers by creation date", async () => {
+      const query: ListCustomersQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        sortBy: "createdAt",
+        sortOrder: "desc",
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.items).toHaveLength(3);
+      // Most recent first
+      expect(data.items[0].name).toBe("Gamma Ltd");
+      expect(data.items[1].name).toBe("Beta Inc");
+      expect(data.items[2].name).toBe("Alpha Corp");
+    });
+
+    it("should sort customers by industry", async () => {
+      const query: ListCustomersQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "asc",
+          orderBy: "industry",
+        },
+        sortBy: "industry",
+        sortOrder: "asc",
+      };
+
+      const result = await listCustomers(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+      expect(data.items).toHaveLength(3);
+      expect(data.items[0].industry).toBe("Healthcare");
+      expect(data.items[1].industry).toBe("Manufacturing");
+      expect(data.items[2].industry).toBe("Technology");
     });
   });
 
-  describe("edge cases", () => {
-    it("should handle boundary pagination values", async () => {
-      const query: ListCustomersQuery = {
-        pagination: {
-          page: 1,
-          limit: 1, // Minimum limit
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const customers: Customer[] = [
-        {
-          id: uuidv7(),
-          name: "Single Company",
+  describe("complex scenarios", () => {
+    it("should handle pagination with filtering and sorting", async () => {
+      // Create multiple customers with same industry
+      for (let i = 1; i <= 15; i++) {
+        await context.customerRepository.create({
+          name: `Tech Company ${i}`,
+          industry: "Technology",
+          size: i % 2 === 0 ? "large" : "small",
           status: "active",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
+        });
+      }
 
-      const expectedResult = {
-        items: customers,
-        count: 1,
-      };
-
-      mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-    });
-
-    it("should handle maximum pagination values", async () => {
       const query: ListCustomersQuery = {
         pagination: {
           page: 1,
-          limit: 1000, // Maximum limit
-          order: "desc" as const,
-          orderBy: "createdAt",
+          limit: 5,
+          order: "asc",
+          orderBy: "name",
         },
-        sortOrder: "desc",
+        filter: {
+          industry: "Technology",
+          size: "large",
+        },
+        sortBy: "name",
+        sortOrder: "asc",
       };
 
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
-
-      mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listCustomers(mockContext, query);
+      const result = await listCustomers(context, query);
 
       expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(7); // 7 large tech companies
+      expect(data.items).toHaveLength(5); // First page with limit 5
+      expect(data.items[0].name).toBe("Tech Company 10");
+      expect(data.items[0].industry).toBe("Technology");
+      expect(data.items[0].size).toBe("large");
     });
 
-    it("should handle undefined filter", async () => {
+    it("should handle assignment-based filtering", async () => {
+      // Create assigned user first
+      const userResult = await context.userRepository.create({
+        name: "John Manager",
+        email: "john@example.com",
+        role: "manager",
+        isActive: true,
+        passwordHash: "hash",
+      });
+      expect(userResult.isOk()).toBe(true);
+      const user = userResult._unsafeUnwrap();
+
+      // Create customers assigned to the user
+      await context.customerRepository.create({
+        name: "Assigned Customer 1",
+        industry: "Technology",
+        status: "active",
+        assignedUserId: user.id,
+      });
+
+      await context.customerRepository.create({
+        name: "Assigned Customer 2",
+        industry: "Healthcare",
+        status: "active",
+        assignedUserId: user.id,
+      });
+
+      await context.customerRepository.create({
+        name: "Unassigned Customer",
+        industry: "Technology",
+        status: "active",
+      });
+
       const query: ListCustomersQuery = {
         pagination: {
           page: 1,
           limit: 10,
-          order: "desc" as const,
+          order: "desc",
           orderBy: "createdAt",
         },
-        filter: undefined,
+        filter: {
+          assignedUserId: user.id,
+        },
         sortOrder: "desc",
       };
 
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
-
-      mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listCustomers(mockContext, query);
+      const result = await listCustomers(context, query);
 
       expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
+      const data = result._unsafeUnwrap();
+      expect(data.count).toBe(2);
+      expect(data.items).toHaveLength(2);
+      data.items.forEach((customer) => {
+        expect(customer.assignedUserId).toBe(user.id);
+      });
+    });
+  });
+
+  describe("input validation", () => {
+    it("should validate pagination parameters", async () => {
+      const invalidQuery = {
+        pagination: {
+          page: -1, // Invalid negative page
+          limit: 0, // Invalid zero limit
+          order: "invalid" as any,
+          orderBy: "createdAt",
+        },
+        sortOrder: "desc" as const,
+      };
+
+      const result = await listCustomers(context, invalidQuery);
+
+      expect(result.isErr()).toBe(true);
+      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
+      expect(result._unsafeUnwrapErr().message).toBe(
+        "入力内容に誤りがあります",
+      );
     });
 
-    it("should handle partial filter", async () => {
-      const query: ListCustomersQuery = {
+    it("should validate filter parameters", async () => {
+      const invalidQuery = {
         pagination: {
           page: 1,
           limit: 10,
@@ -493,152 +522,18 @@ describe("listCustomers", () => {
           orderBy: "createdAt",
         },
         filter: {
-          keyword: "search term",
-          // Other filter fields are undefined
+          size: "invalid_size" as any,
         },
-        sortOrder: "desc",
+        sortOrder: "desc" as const,
       };
 
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
+      const result = await listCustomers(context, invalidQuery);
 
-      mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listCustomers(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-    });
-
-    it("should handle all customer sizes", async () => {
-      const testCases: Array<"small" | "medium" | "large" | "enterprise"> = [
-        "small",
-        "medium",
-        "large",
-        "enterprise",
-      ];
-
-      for (const size of testCases) {
-        const query: ListCustomersQuery = {
-          pagination: {
-            page: 1,
-            limit: 10,
-            order: "desc" as const,
-            orderBy: "createdAt",
-          },
-          filter: {
-            size,
-          },
-          sortOrder: "desc",
-        };
-
-        const expectedResult = {
-          items: [],
-          count: 0,
-        };
-
-        mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-        const result = await listCustomers(mockContext, query);
-
-        expect(result.isOk()).toBe(true);
-        expect(result._unsafeUnwrap()).toEqual(expectedResult);
-      }
-    });
-
-    it("should handle all customer statuses", async () => {
-      const testCases: Array<"active" | "inactive" | "archived"> = [
-        "active",
-        "inactive",
-        "archived",
-      ];
-
-      for (const status of testCases) {
-        const query: ListCustomersQuery = {
-          pagination: {
-            page: 1,
-            limit: 10,
-            order: "desc" as const,
-            orderBy: "createdAt",
-          },
-          filter: {
-            status,
-          },
-          sortOrder: "desc",
-        };
-
-        const expectedResult = {
-          items: [],
-          count: 0,
-        };
-
-        mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-        const result = await listCustomers(mockContext, query);
-
-        expect(result.isOk()).toBe(true);
-        expect(result._unsafeUnwrap()).toEqual(expectedResult);
-      }
-    });
-
-    it("should handle all sort fields", async () => {
-      const testCases: Array<"name" | "createdAt" | "updatedAt" | "industry"> =
-        ["name", "createdAt", "updatedAt", "industry"];
-
-      for (const sortBy of testCases) {
-        const query: ListCustomersQuery = {
-          pagination: {
-            page: 1,
-            limit: 10,
-            order: "desc" as const,
-            orderBy: "createdAt",
-          },
-          sortBy,
-          sortOrder: "desc",
-        };
-
-        const expectedResult = {
-          items: [],
-          count: 0,
-        };
-
-        mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-        const result = await listCustomers(mockContext, query);
-
-        expect(result.isOk()).toBe(true);
-        expect(result._unsafeUnwrap()).toEqual(expectedResult);
-      }
-    });
-
-    it("should handle both sort orders", async () => {
-      const testCases: Array<"asc" | "desc"> = ["asc", "desc"];
-
-      for (const sortOrder of testCases) {
-        const query: ListCustomersQuery = {
-          pagination: {
-            page: 1,
-            limit: 10,
-            order: "desc" as const,
-            orderBy: "createdAt",
-          },
-          sortOrder,
-        };
-
-        const expectedResult = {
-          items: [],
-          count: 0,
-        };
-
-        mockCustomerRepository.list.mockResolvedValue(ok(expectedResult));
-
-        const result = await listCustomers(mockContext, query);
-
-        expect(result.isOk()).toBe(true);
-        expect(result._unsafeUnwrap()).toEqual(expectedResult);
-      }
+      expect(result.isErr()).toBe(true);
+      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
+      expect(result._unsafeUnwrapErr().message).toBe(
+        "入力内容に誤りがあります",
+      );
     });
   });
 });

@@ -189,8 +189,8 @@ AnyError
 - `src/core/application/*/test.ts` - 型定義の修正
 
 ### パフォーマンス改善
-- `src/core/adapters/drizzlePqlite/customerRepository.ts:398` - 検索クエリの最適化
-- `src/core/adapters/drizzlePqlite/schema.ts` - インデックス追加
+- `src/core/adapters/drizzlePglite/customerRepository.ts:398` - 検索クエリの最適化
+- `src/core/adapters/drizzlePglite/schema.ts` - インデックス追加
 
 ## 7. 結論
 

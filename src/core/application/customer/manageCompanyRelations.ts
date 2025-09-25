@@ -77,7 +77,7 @@ export async function manageCompanyRelations(
   if (validInput.action === "remove") {
     const updateResult = await context.customerRepository.update(
       validInput.childCustomerId,
-      { parentCustomerId: undefined },
+      { parentCustomerId: null as any },
     );
 
     if (updateResult.isErr()) {

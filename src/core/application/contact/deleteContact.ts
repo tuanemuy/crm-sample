@@ -1,4 +1,5 @@
 import { err, ok, type Result } from "neverthrow";
+import { z } from "zod/v4";
 import type { Context } from "@/core/application/context";
 import { ApplicationError } from "@/lib/error";
 
@@ -6,6 +7,15 @@ export async function deleteContact(
   context: Context,
   contactId: string,
 ): Promise<Result<void, ApplicationError>> {
+  // Validate input
+  const uuidSchema = z.string().uuid();
+  const validateResult = uuidSchema.safeParse(contactId);
+  if (!validateResult.success) {
+    return err(
+      new ApplicationError("Invalid input: Contact ID must be a valid UUID"),
+    );
+  }
+
   // Check if contact exists
   const getResult = await context.contactRepository.findById(contactId);
   if (getResult.isErr()) {

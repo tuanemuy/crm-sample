@@ -1,5 +1,6 @@
 import { err, ok, type Result } from "neverthrow";
 import type { Context } from "@/core/application/context";
+import { ERROR_MESSAGES } from "@/core/application/errors/messages";
 import {
   type Contact,
   type CreateContactInput,
@@ -17,7 +18,7 @@ export async function createContact(
   if (validationResult.isErr()) {
     return err(
       new ApplicationError(
-        "Invalid input for creating contact",
+        ERROR_MESSAGES.CONTACT_INVALID_INPUT,
         validationResult.error,
       ),
     );

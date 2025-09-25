@@ -29,6 +29,7 @@ export const createContactInputSchema = z.object({
   phone: z.string().optional(),
   mobile: z.string().optional(),
   isPrimary: z.boolean().default(false),
+  isActive: z.boolean().default(true),
 });
 
 export type CreateContactInput = z.infer<typeof createContactInputSchema>;

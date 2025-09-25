@@ -62,7 +62,7 @@
 - ScoringRule: 柔軟な条件設定機能
 - User: 認証・権限管理対応
 
-#### アダプター層 (`src/core/adapters/drizzlePqlite/`)
+#### アダプター層 (`src/core/adapters/drizzlePglite/`)
 - **評価**: 優秀
 - **データベース設計**: 
   - 68のテーブルによる包括的な設計

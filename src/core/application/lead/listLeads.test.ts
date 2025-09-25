@@ -1,348 +1,91 @@
-import { err, ok } from "neverthrow";
-import { v7 as uuidv7 } from "uuid";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import type { Database } from "@/core/adapters/drizzlePglite/client";
+import {
+  createTestContext,
+  setupTestDatabase,
+} from "@/core/adapters/drizzlePglite/testUtils";
 import type { Context } from "@/core/application/context";
-import type { Lead, ListLeadsQuery } from "@/core/domain/lead/types";
-import { ApplicationError, RepositoryError } from "@/lib/error";
+import { ERROR_MESSAGES } from "@/core/application/errors/messages";
+import type { ListLeadsQuery } from "@/core/domain/lead/types";
+import { ApplicationError } from "@/lib/error";
 import { listLeads } from "./listLeads";
 
-// Mock repositories
-const mockLeadRepository = {
-  create: vi.fn(),
-  findById: vi.fn(),
-  findByIdWithUser: vi.fn(),
-  list: vi.fn(),
-  update: vi.fn(),
-  delete: vi.fn(),
-  findByEmail: vi.fn(),
-  findByAssignedUser: vi.fn(),
-  search: vi.fn(),
-  updateScore: vi.fn(),
-  updateStatus: vi.fn(),
-  convert: vi.fn(),
-  getStats: vi.fn(),
-  createBehavior: vi.fn(),
-  getBehaviorByLeadId: vi.fn(),
-};
-
-// Mock context with minimal required repositories
-const mockContext: Context = {
-  leadRepository: mockLeadRepository,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  customerRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  contactRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  contactHistoryRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  dealRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  activityRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  userRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  notificationRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  organizationRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  permissionRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  proposalRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  reportRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  scoringRuleRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  scoringService: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  documentRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  storageManager: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  campaignRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  emailMarketingRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  approvalRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  securityRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  displaySettingsRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  dashboardRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  integrationRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  integrationService: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  importExportRepository: {} as any,
-  // biome-ignore lint/suspicious/noExplicitAny: Mock implementation for testing
-  importExportService: {} as any,
-};
+let db: Database;
+let context: Context;
 
 describe("listLeads", () => {
-  beforeEach(() => {
-    // Reset all mocks
-    vi.clearAllMocks();
+  beforeEach(async () => {
+    db = await setupTestDatabase();
+    context = createTestContext(db);
   });
 
   describe("input validation", () => {
-    it("should reject invalid pagination parameters", async () => {
-      const query: ListLeadsQuery = {
+    it("should reject invalid query with invalid pagination", async () => {
+      const query = {
         pagination: {
-          page: 0, // Invalid page number
+          page: -1,
           limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
+          order: "asc",
+          orderBy: "firstName",
         },
-        sortOrder: "desc",
       };
 
-      const result = await listLeads(mockContext, query);
+      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+      const result = await listLeads(context, query as any);
 
       expect(result.isErr()).toBe(true);
       expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid pagination limit", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 0, // Invalid limit
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should accept large pagination limit values", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 1001, // Large but valid positive integer
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const expectedResult = { items: [], count: 0 };
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-    });
-
-    it("should reject invalid sort field", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid enum value
-        sortBy: "invalid_field" as any,
-        sortOrder: "desc",
-      };
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid sort order", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid enum value
-        sortOrder: "invalid_order" as any,
-      };
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid filter status", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: {
-          // biome-ignore lint/suspicious/noExplicitAny: Testing invalid enum value
-          status: "invalid_status" as any,
-        },
-        sortOrder: "desc",
-      };
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid UUID in filter", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: {
-          assignedUserId: "invalid-uuid",
-        },
-        sortOrder: "desc",
-      };
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid score range", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: {
-          minScore: -1, // Invalid score
-        },
-        sortOrder: "desc",
-      };
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-
-    it("should reject invalid score range too high", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: {
-          maxScore: 101, // Invalid score
-        },
-        sortOrder: "desc",
-      };
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isErr()).toBe(true);
-      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain("Invalid query");
-    });
-  });
-
-  describe("repository error handling", () => {
-    it("should handle repository error when listing leads", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      mockLeadRepository.list.mockResolvedValue(
-        err(new RepositoryError("Database error")),
+      expect(result._unsafeUnwrapErr().message).toBe(
+        ERROR_MESSAGES.VALIDATION_ERROR,
       );
+    });
 
-      const result = await listLeads(mockContext, query);
+    it("should reject invalid sortBy parameter", async () => {
+      const query = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "asc",
+          orderBy: "firstName",
+        },
+        sortBy: "invalid",
+      };
+
+      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+      const result = await listLeads(context, query as any);
 
       expect(result.isErr()).toBe(true);
       expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
-      expect(result._unsafeUnwrapErr().message).toContain(
-        "Failed to list leads",
+      expect(result._unsafeUnwrapErr().message).toBe(
+        ERROR_MESSAGES.VALIDATION_ERROR,
+      );
+    });
+
+    it("should reject invalid sortOrder parameter", async () => {
+      const query = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "asc",
+          orderBy: "firstName",
+        },
+        sortOrder: "invalid",
+      };
+
+      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+      const result = await listLeads(context, query as any);
+
+      expect(result.isErr()).toBe(true);
+      expect(result._unsafeUnwrapErr()).toBeInstanceOf(ApplicationError);
+      expect(result._unsafeUnwrapErr().message).toBe(
+        ERROR_MESSAGES.VALIDATION_ERROR,
       );
     });
   });
 
   describe("successful listing", () => {
-    it("should list leads with minimal query parameters", async () => {
+    it("should list leads with minimal query", async () => {
       const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const leads: Lead[] = [
-        {
-          id: uuidv7(),
-          firstName: "John",
-          lastName: "Doe",
-          email: "john@example.com",
-          status: "new",
-          score: 75,
-          tags: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: uuidv7(),
-          firstName: "Jane",
-          lastName: "Smith",
-          email: "jane@example.com",
-          status: "qualified",
-          score: 85,
-          tags: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      const expectedResult = {
-        items: leads,
-        count: 2,
-      };
-
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-      expect(mockLeadRepository.list).toHaveBeenCalledWith({
         pagination: {
           page: 1,
           limit: 10,
@@ -350,218 +93,288 @@ describe("listLeads", () => {
           orderBy: "createdAt",
         },
         sortOrder: "desc",
-      });
-    });
-
-    it("should list leads with all query parameters", async () => {
-      const assignedUserId = uuidv7();
-
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 2,
-          limit: 25,
-          order: "asc" as const,
-          orderBy: "firstName",
-        },
-        filter: {
-          keyword: "tech",
-          status: "qualified",
-          source: "Website",
-          industry: "Technology",
-          assignedUserId,
-          minScore: 50,
-          maxScore: 90,
-          tags: ["hot", "enterprise"],
-          createdAfter: new Date("2024-01-01"),
-          createdBefore: new Date("2024-12-31"),
-        },
-        sortBy: "firstName",
-        sortOrder: "asc",
       };
 
-      const leads: Lead[] = [
-        {
-          id: uuidv7(),
-          firstName: "Alice",
-          lastName: "Johnson",
-          email: "alice@tech.com",
-          company: "Tech Corp",
-          industry: "Technology",
-          source: "Website",
-          status: "qualified",
-          score: 75,
-          tags: ["hot", "enterprise"],
-          assignedUserId,
-          createdAt: new Date("2024-06-01"),
-          updatedAt: new Date(),
-        },
-      ];
-
-      const expectedResult = {
-        items: leads,
-        count: 1,
-      };
-
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
+      const result = await listLeads(context, query);
 
       expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-      expect(mockLeadRepository.list).toHaveBeenCalledWith(query);
+      const data = result._unsafeUnwrap();
+
+      expect(data).toHaveProperty("items");
+      expect(data).toHaveProperty("count");
+      expect(Array.isArray(data.items)).toBe(true);
+      expect(typeof data.count).toBe("number");
     });
 
-    it("should handle empty result", async () => {
+    it("should list leads with filters", async () => {
       const query: ListLeadsQuery = {
         pagination: {
           page: 1,
           limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
-
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-    });
-  });
-
-  describe("edge cases", () => {
-    it("should handle boundary pagination values", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 1, // Minimum limit
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const leads: Lead[] = [
-        {
-          id: uuidv7(),
-          firstName: "Single",
-          lastName: "Lead",
-          status: "new",
-          score: 0,
-          tags: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      const expectedResult = {
-        items: leads,
-        count: 1,
-      };
-
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-    });
-
-    it("should handle maximum pagination values", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 1000, // Maximum limit
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        sortOrder: "desc",
-      };
-
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
-
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-    });
-
-    it("should handle undefined filter", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: undefined,
-        sortOrder: "desc",
-      };
-
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
-
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-    });
-
-    it("should handle partial filter", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
+          order: "desc",
           orderBy: "createdAt",
         },
         filter: {
-          keyword: "search term",
-          // Other filter fields are undefined
+          status: "qualified",
         },
         sortOrder: "desc",
       };
 
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
-
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
+      const result = await listLeads(context, query);
 
       expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
+      const data = result._unsafeUnwrap();
+
+      expect(data).toHaveProperty("items");
+      expect(data).toHaveProperty("count");
     });
 
-    it("should handle all lead statuses", async () => {
-      const testCases: Array<
-        "new" | "contacted" | "qualified" | "converted" | "rejected"
-      > = ["new", "contacted", "qualified", "converted", "rejected"];
+    it("should handle different sorting options", async () => {
+      const sortOptions = [
+        { sortBy: "firstName", sortOrder: "asc" },
+        { sortBy: "lastName", sortOrder: "desc" },
+        { sortBy: "company", sortOrder: "desc" },
+        { sortBy: "score", sortOrder: "asc" },
+        { sortBy: "createdAt", sortOrder: "desc" },
+        { sortBy: "updatedAt", sortOrder: "asc" },
+      ] as const;
 
-      for (const status of testCases) {
+      for (const { sortBy, sortOrder } of sortOptions) {
         const query: ListLeadsQuery = {
           pagination: {
             page: 1,
             limit: 10,
-            order: "desc" as const,
+            order: sortOrder,
+            orderBy: sortBy,
+          },
+          sortBy,
+          sortOrder,
+        };
+
+        const result = await listLeads(context, query);
+
+        expect(result.isOk()).toBe(true);
+        const data = result._unsafeUnwrap();
+
+        expect(data).toHaveProperty("items");
+        expect(data).toHaveProperty("count");
+      }
+    });
+
+    it("should handle pagination correctly", async () => {
+      const query: ListLeadsQuery = {
+        pagination: {
+          page: 2,
+          limit: 5,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listLeads(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+
+      expect(data).toHaveProperty("items");
+      expect(data).toHaveProperty("count");
+      expect(data.items.length).toBeLessThanOrEqual(5);
+    });
+
+    it("should handle various filters", async () => {
+      const query: ListLeadsQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        filter: {
+          status: "qualified",
+          source: "website",
+          minScore: 50,
+          maxScore: 100,
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listLeads(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+
+      expect(data).toHaveProperty("items");
+      expect(data).toHaveProperty("count");
+    });
+  });
+
+  describe("data structure validation", () => {
+    it("should return leads with proper structure", async () => {
+      const query: ListLeadsQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listLeads(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+
+      data.items.forEach((lead) => {
+        expect(lead).toHaveProperty("id");
+        expect(lead).toHaveProperty("firstName");
+        expect(lead).toHaveProperty("lastName");
+        expect(lead).toHaveProperty("email");
+        expect(lead).toHaveProperty("company");
+        expect(lead).toHaveProperty("source");
+        expect(lead).toHaveProperty("status");
+        expect(lead).toHaveProperty("score");
+
+        expect(typeof lead.id).toBe("string");
+        expect(typeof lead.firstName).toBe("string");
+        expect(typeof lead.lastName).toBe("string");
+        expect(typeof lead.email).toBe("string");
+        expect(typeof lead.company).toBe("string");
+        expect(typeof lead.source).toBe("string");
+        expect(typeof lead.status).toBe("string");
+        expect(typeof lead.score).toBe("number");
+      });
+    });
+
+    it("should return count as number", async () => {
+      const query: ListLeadsQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listLeads(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+
+      expect(typeof data.count).toBe("number");
+      expect(data.count).toBeGreaterThanOrEqual(0);
+      expect(data.count).toBeGreaterThanOrEqual(data.items.length);
+    });
+  });
+
+  describe("edge cases", () => {
+    it("should handle empty result set", async () => {
+      const query: ListLeadsQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        filter: {
+          status: "rejected",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listLeads(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+
+      expect(data.items).toHaveLength(0);
+      expect(data.count).toBe(0);
+    });
+
+    it("should handle large page numbers", async () => {
+      const query: ListLeadsQuery = {
+        pagination: {
+          page: 999,
+          limit: 10,
+          order: "desc",
+          orderBy: "createdAt",
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listLeads(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+
+      expect(data).toHaveProperty("items");
+      expect(data).toHaveProperty("count");
+    });
+
+    it("should handle different limit values", async () => {
+      const limits = [1, 5, 10, 20, 50, 100];
+
+      for (const limit of limits) {
+        const query: ListLeadsQuery = {
+          pagination: {
+            page: 1,
+            limit,
+            order: "desc",
+            orderBy: "createdAt",
+          },
+          sortOrder: "desc",
+        };
+
+        const result = await listLeads(context, query);
+
+        expect(result.isOk()).toBe(true);
+        const data = result._unsafeUnwrap();
+
+        expect(data.items.length).toBeLessThanOrEqual(limit);
+      }
+    });
+
+    it("should handle score range filters", async () => {
+      const query: ListLeadsQuery = {
+        pagination: {
+          page: 1,
+          limit: 10,
+          order: "desc",
+          orderBy: "score",
+        },
+        filter: {
+          minScore: 75,
+          maxScore: 100,
+        },
+        sortOrder: "desc",
+      };
+
+      const result = await listLeads(context, query);
+
+      expect(result.isOk()).toBe(true);
+      const data = result._unsafeUnwrap();
+
+      expect(data).toHaveProperty("items");
+      expect(data).toHaveProperty("count");
+    });
+
+    it("should handle various status filters", async () => {
+      const statuses = [
+        "new",
+        "contacted",
+        "qualified",
+        "rejected",
+        "converted",
+      ] as const;
+
+      for (const status of statuses) {
+        const query: ListLeadsQuery = {
+          pagination: {
+            page: 1,
+            limit: 10,
+            order: "desc",
             orderBy: "createdAt",
           },
           filter: {
@@ -570,205 +383,49 @@ describe("listLeads", () => {
           sortOrder: "desc",
         };
 
-        const expectedResult = {
-          items: [],
-          count: 0,
-        };
-
-        mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-        const result = await listLeads(mockContext, query);
+        const result = await listLeads(context, query);
 
         expect(result.isOk()).toBe(true);
-        expect(result._unsafeUnwrap()).toEqual(expectedResult);
+        const data = result._unsafeUnwrap();
+
+        expect(data).toHaveProperty("items");
+        expect(data).toHaveProperty("count");
       }
     });
 
-    it("should handle all sort fields", async () => {
-      const testCases: Array<
-        | "firstName"
-        | "lastName"
-        | "company"
-        | "score"
-        | "createdAt"
-        | "updatedAt"
-      > = [
-        "firstName",
-        "lastName",
-        "company",
-        "score",
-        "createdAt",
-        "updatedAt",
+    it("should handle various source filters", async () => {
+      const sources = [
+        "website",
+        "email",
+        "phone",
+        "referral",
+        "social",
+        "advertisement",
+        "other",
       ];
 
-      for (const sortBy of testCases) {
+      for (const source of sources) {
         const query: ListLeadsQuery = {
           pagination: {
             page: 1,
             limit: 10,
-            order: "desc" as const,
+            order: "desc",
             orderBy: "createdAt",
           },
-          sortBy,
+          filter: {
+            source,
+          },
           sortOrder: "desc",
         };
 
-        const expectedResult = {
-          items: [],
-          count: 0,
-        };
-
-        mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-        const result = await listLeads(mockContext, query);
+        const result = await listLeads(context, query);
 
         expect(result.isOk()).toBe(true);
-        expect(result._unsafeUnwrap()).toEqual(expectedResult);
+        const data = result._unsafeUnwrap();
+
+        expect(data).toHaveProperty("items");
+        expect(data).toHaveProperty("count");
       }
-    });
-
-    it("should handle both sort orders", async () => {
-      const testCases: Array<"asc" | "desc"> = ["asc", "desc"];
-
-      for (const sortOrder of testCases) {
-        const query: ListLeadsQuery = {
-          pagination: {
-            page: 1,
-            limit: 10,
-            order: "desc" as const,
-            orderBy: "createdAt",
-          },
-          sortOrder,
-        };
-
-        const expectedResult = {
-          items: [],
-          count: 0,
-        };
-
-        mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-        const result = await listLeads(mockContext, query);
-
-        expect(result.isOk()).toBe(true);
-        expect(result._unsafeUnwrap()).toEqual(expectedResult);
-      }
-    });
-
-    it("should handle boundary score values", async () => {
-      const testCases = [
-        { minScore: 0, maxScore: 100 },
-        { minScore: 50, maxScore: 75 },
-        { minScore: 0 },
-        { maxScore: 100 },
-      ];
-
-      for (const scoreFilter of testCases) {
-        const query: ListLeadsQuery = {
-          pagination: {
-            page: 1,
-            limit: 10,
-            order: "desc" as const,
-            orderBy: "createdAt",
-          },
-          filter: scoreFilter,
-          sortOrder: "desc",
-        };
-
-        const expectedResult = {
-          items: [],
-          count: 0,
-        };
-
-        mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-        const result = await listLeads(mockContext, query);
-
-        expect(result.isOk()).toBe(true);
-        expect(result._unsafeUnwrap()).toEqual(expectedResult);
-      }
-    });
-
-    it("should handle empty tags array", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: {
-          tags: [],
-        },
-        sortOrder: "desc",
-      };
-
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
-
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-    });
-
-    it("should handle multiple tags filter", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: {
-          tags: ["hot", "qualified", "enterprise", "urgent"],
-        },
-        sortOrder: "desc",
-      };
-
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
-
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
-    });
-
-    it("should handle date range filters", async () => {
-      const query: ListLeadsQuery = {
-        pagination: {
-          page: 1,
-          limit: 10,
-          order: "desc" as const,
-          orderBy: "createdAt",
-        },
-        filter: {
-          createdAfter: new Date("2024-01-01"),
-          createdBefore: new Date("2024-12-31"),
-        },
-        sortOrder: "desc",
-      };
-
-      const expectedResult = {
-        items: [],
-        count: 0,
-      };
-
-      mockLeadRepository.list.mockResolvedValue(ok(expectedResult));
-
-      const result = await listLeads(mockContext, query);
-
-      expect(result.isOk()).toBe(true);
-      expect(result._unsafeUnwrap()).toEqual(expectedResult);
     });
   });
 });

@@ -1,0 +1,7 @@
+
+> crm-sample@0.1.0 test /home/hikaru/agent/github.com/tuanemuy/crm-sample
+> vitest run --poolOptions.threads.singleThread
+
+
+ RUN  v3.2.4 /home/hikaru/agent/github.com/tuanemuy/crm-sample
+

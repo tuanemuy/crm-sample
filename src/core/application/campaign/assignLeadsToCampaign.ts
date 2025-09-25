@@ -18,6 +18,12 @@ export async function assignLeadsToCampaign(
   context: Context,
   input: AssignLeadsToCampaignInput,
 ): Promise<Result<CampaignLead[], ApplicationError>> {
+  // Validate input
+  const parsedInput = assignLeadsToCampaignInputSchema.safeParse(input);
+  if (!parsedInput.success) {
+    return err(new ApplicationError("Invalid input"));
+  }
+
   // Verify campaign exists
   const campaignResult = await context.campaignRepository.findById(
     input.campaignId,

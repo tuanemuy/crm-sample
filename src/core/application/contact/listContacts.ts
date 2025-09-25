@@ -1,5 +1,6 @@
 import { err, ok, type Result } from "neverthrow";
 import type { Context } from "@/core/application/context";
+import { ERROR_MESSAGES } from "@/core/application/errors/messages";
 import {
   type Contact,
   type ListContactsQuery,
@@ -17,7 +18,7 @@ export async function listContacts(
   if (validationResult.isErr()) {
     return err(
       new ApplicationError(
-        "Invalid query for listing contacts",
+        ERROR_MESSAGES.VALIDATION_ERROR,
         validationResult.error,
       ),
     );

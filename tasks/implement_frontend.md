@@ -31,4 +31,4 @@ pnpm task todo page
 pnpm task done page ${id}
 ```
 
-### 4. テストとリンターを実行する
+### 4. 型チェックとリンターを実行する

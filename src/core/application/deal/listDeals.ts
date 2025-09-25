@@ -1,5 +1,6 @@
 import { err, type Result } from "neverthrow";
 import type { Context } from "@/core/application/context";
+import { ERROR_MESSAGES } from "@/core/application/errors/messages";
 import {
   type Deal,
   type ListDealsQuery,
@@ -17,7 +18,7 @@ export async function listDeals(
   if (validationResult.isErr()) {
     return err(
       new ApplicationError(
-        "Invalid query for listing deals",
+        ERROR_MESSAGES.VALIDATION_ERROR,
         validationResult.error,
       ),
     );

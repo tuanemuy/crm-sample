@@ -128,3 +128,33 @@ export const changePasswordInputSchema = z.object({
 });
 
 export type ChangePasswordInput = z.infer<typeof changePasswordInputSchema>;
+
+// Additional user input types for specific operations
+export const activateUserInputSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export type ActivateUserInput = z.infer<typeof activateUserInputSchema>;
+
+export const deactivateUserInputSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export type DeactivateUserInput = z.infer<typeof deactivateUserInputSchema>;
+
+export const listUsersInputSchema = z.object({
+  filter: userFilterSchema.optional(),
+  pagination: paginationSchema,
+  sortBy: z
+    .enum(["name", "email", "role", "createdAt", "updatedAt", "lastLoginAt"])
+    .optional(),
+  sortOrder: z.enum(["asc", "desc"]).default("asc"),
+});
+
+export type ListUsersInput = z.infer<typeof listUsersInputSchema>;
+
+export const updateUserInputWithIdSchema = updateUserInputSchema.extend({
+  id: z.string().uuid(),
+});
+
+export type UpdateUserInputWithId = z.infer<typeof updateUserInputWithIdSchema>;

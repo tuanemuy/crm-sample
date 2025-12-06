@@ -93,7 +93,9 @@ export function RecentActivities() {
       <div className="card-body">
         <div className="flex items-center justify-between mb-4">
           <h2 className="card-title text-base-content">最近の活動</h2>
-          <button className="btn btn-sm btn-ghost">すべて表示</button>
+          <button type="button" className="btn btn-sm btn-ghost">
+            すべて表示
+          </button>
         </div>
 
         <div className="space-y-4">

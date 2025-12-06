@@ -175,6 +175,7 @@ export function CustomerList() {
               <tr>
                 <th>
                   <button
+                    type="button"
                     onClick={() => handleSort("name")}
                     className="flex items-center gap-1 font-semibold"
                   >
@@ -193,6 +194,7 @@ export function CustomerList() {
                 <th>連絡先</th>
                 <th>
                   <button
+                    type="button"
                     onClick={() => handleSort("lastContact")}
                     className="flex items-center gap-1 font-semibold"
                   >
@@ -252,16 +254,19 @@ export function CustomerList() {
                   <td>
                     <div className="flex gap-1">
                       <Link href={`/customers/${customer.id}`}>
-                        <button className="btn btn-ghost btn-xs">
+                        <button type="button" className="btn btn-ghost btn-xs">
                           <EyeIcon className="h-3 w-3" />
                         </button>
                       </Link>
                       <Link href={`/customers/${customer.id}/edit`}>
-                        <button className="btn btn-ghost btn-xs">
+                        <button type="button" className="btn btn-ghost btn-xs">
                           <PencilIcon className="h-3 w-3" />
                         </button>
                       </Link>
-                      <button className="btn btn-ghost btn-xs text-error">
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-xs text-error"
+                      >
                         <TrashIcon className="h-3 w-3" />
                       </button>
                     </div>
@@ -281,6 +286,7 @@ export function CustomerList() {
 
           <div className="join">
             <button
+              type="button"
               className="join-item btn btn-sm"
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
@@ -291,6 +297,7 @@ export function CustomerList() {
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
+                type="button"
                 className={`join-item btn btn-sm ${
                   currentPage === page ? "btn-active" : ""
                 }`}
@@ -301,6 +308,7 @@ export function CustomerList() {
             ))}
 
             <button
+              type="button"
               className="join-item btn btn-sm"
               onClick={() =>
                 setCurrentPage((prev) => Math.min(totalPages, prev + 1))

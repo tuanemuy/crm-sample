@@ -1,0 +1,1383 @@
+src/components/reports/ReportChart.tsx:53:30 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+  
+    51 │           {/* 簡易チャート表示（実際の実装ではChart.jsやRechartsなどを使用） */}
+    52 │           <div className="h-64 bg-base-200 rounded-lg flex items-end p-4 gap-4">
+  > 53 │             {data.map((item: any) => (
+       │                              ^^^
+    54 │               <div
+    55 │                 key={item.month}
+  
+  i any disables many type checking rules. Its use should be avoided.
+  
+
+src/components/reports/ReportChart.tsx:3:11 lint/correctness/noUnusedVariables ━━━━━━━━━━━━━━━━━━━━━
+
+  ! This interface SalesData is unused.
+  
+    1 │ "use client";
+    2 │ 
+  > 3 │ interface SalesData {
+      │           ^^^^^^^^^
+    4 │   month: string;
+    5 │   sales: number;
+  
+  i Unused variables are often the result of an incomplete refactoring, typos, or other sources of bugs.
+  
+
+src/components/leads/LeadScoring.tsx:463:15 lint/a11y/useKeyWithClickEvents ━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Enforce to have the onClick mouse event with the onKeyUp, the onKeyDown, or the onKeyPress keyboard event.
+  
+    461 │           <div key={category.id} className="card bg-base-100 shadow-sm">
+    462 │             <div className="card-body">
+  > 463 │               <div
+        │               ^^^^
+  > 464 │                 className="flex items-center justify-between cursor-pointer"
+         ...
+  > 469 │                 }
+  > 470 │               >
+        │               ^
+    471 │                 <div className="flex items-center gap-4">
+    472 │                   <div>
+  
+  i Actions triggered using mouse events should have corresponding keyboard events to account for keyboard-only navigation.
+  
+
+src/components/leads/LeadScoring.tsx:463:15 lint/a11y/noStaticElementInteractions ━━━━━━━━━━━━━━━━━━
+
+  × Static Elements should not be interactive.
+  
+    461 │           <div key={category.id} className="card bg-base-100 shadow-sm">
+    462 │             <div className="card-body">
+  > 463 │               <div
+        │               ^^^^
+  > 464 │                 className="flex items-center justify-between cursor-pointer"
+         ...
+  > 469 │                 }
+  > 470 │               >
+        │               ^
+    471 │                 <div className="flex items-center gap-4">
+    472 │                   <div>
+  
+  i To add interactivity such as a mouse or key event listener to a static element, give the element an appropriate role value.
+  
+
+src/components/reports/CustomReportBuilder.tsx:141:15 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    139 │           <div className="space-y-4">
+    140 │             <div>
+  > 141 │               <label className="label">レポート名</label>
+        │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    142 │               <input
+    143 │                 type="text"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/reports/CustomReportBuilder.tsx:342:9 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    340 │         </button>
+    341 │ 
+  > 342 │         <button className="btn btn-outline">
+        │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    343 │           <ShareIcon className="h-4 w-4" />
+    344 │           共有
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/CustomReportBuilder.tsx:168:15 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    167 │             <div>
+  > 168 │               <label className="label">チャートタイプ</label>
+        │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    169 │               <select
+    170 │                 className="select select-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/reports/CustomReportBuilder.tsx:262:13 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    260 │           <div className="flex items-center justify-between mb-4">
+    261 │             <h3 className="text-lg font-semibold">フィルター条件</h3>
+  > 262 │             <button className="btn btn-outline btn-sm" onClick={addFilter}>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    263 │               <PlusIcon className="h-4 w-4" />
+    264 │               追加
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/CustomReportBuilder.tsx:311:17 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    309 │                 />
+    310 │ 
+  > 311 │                 <button
+        │                 ^^^^^^^
+  > 312 │                   className="btn btn-ghost btn-sm"
+  > 313 │                   onClick={() => removeFilter(filter.id)}
+  > 314 │                 >
+        │                 ^
+    315 │                   <TrashIcon className="h-4 w-4" />
+    316 │                 </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/CustomReportBuilder.tsx:331:9 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    329 │       {/* アクションボタン */}
+    330 │       <div className="flex gap-3">
+  > 331 │         <button
+        │         ^^^^^^^
+  > 332 │           className="btn btn-primary flex-1"
+         ...
+  > 336 │           }
+  > 337 │         >
+        │         ^
+    338 │           <DocumentIcon className="h-4 w-4" />
+    339 │           レポートを保存
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/CustomReportBuilder.tsx:152:15 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    151 │             <div>
+  > 152 │               <label className="label">データソース</label>
+        │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    153 │               <select
+    154 │                 className="select select-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/reports/CustomReportPreview.tsx:26:13 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    24 │               プレビュー
+    25 │             </h3>
+  > 26 │             <button className="btn btn-outline btn-sm">
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    27 │               <ArrowPathIcon className="h-4 w-4" />
+    28 │               更新
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportDataTable.tsx:337:15 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    335 │               )}
+    336 │ 
+  > 337 │               <button
+        │               ^^^^^^^
+  > 338 │                 className="join-item btn btn-sm"
+         ...
+  > 342 │                 disabled={currentPage === totalPages}
+  > 343 │               >
+        │               ^
+    344 │                 <ChevronRightIcon className="h-4 w-4" />
+    345 │               </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportDataTable.tsx:142:21 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    140 │                 <tr>
+    141 │                   <th>
+  > 142 │                     <button
+        │                     ^^^^^^^
+  > 143 │                       onClick={() => handleSort("date")}
+  > 144 │                       className="flex items-center gap-1 font-semibold"
+  > 145 │                     >
+        │                     ^
+    146 │                       日付
+    147 │                       {sortBy === "date" && (
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportDataTable.tsx:157:21 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    155 │                   <th>商品・サービス</th>
+    156 │                   <th>
+  > 157 │                     <button
+        │                     ^^^^^^^
+  > 158 │                       onClick={() => handleSort("amount")}
+  > 159 │                       className="flex items-center gap-1 font-semibold"
+  > 160 │                     >
+        │                     ^
+    161 │                       金額
+    162 │                       {sortBy === "amount" && (
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportDataTable.tsx:208:15 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    207 │             <div className="join">
+  > 208 │               <button
+        │               ^^^^^^^
+  > 209 │                 className="join-item btn btn-sm"
+  > 210 │                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+  > 211 │                 disabled={currentPage === 1}
+  > 212 │               >
+        │               ^
+    213 │                 <ChevronLeftIcon className="h-4 w-4" />
+    214 │               </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportDataTable.tsx:218:19 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    216 │               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+    217 │                 (page) => (
+  > 218 │                   <button
+        │                   ^^^^^^^
+  > 219 │                     key={page}
+         ...
+  > 223 │                     onClick={() => setCurrentPage(page)}
+  > 224 │                   >
+        │                   ^
+    225 │                     {page}
+    226 │                   </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportDataTable.tsx:230:15 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    228 │               )}
+    229 │ 
+  > 230 │               <button
+        │               ^^^^^^^
+  > 231 │                 className="join-item btn btn-sm"
+         ...
+  > 235 │                 disabled={currentPage === totalPages}
+  > 236 │               >
+        │               ^
+    237 │                 <ChevronRightIcon className="h-4 w-4" />
+    238 │               </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportDataTable.tsx:259:21 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    257 │                 <tr>
+    258 │                   <th>
+  > 259 │                     <button
+        │                     ^^^^^^^
+  > 260 │                       onClick={() => handleSort("date")}
+  > 261 │                       className="flex items-center gap-1 font-semibold"
+  > 262 │                     >
+        │                     ^
+    263 │                       日付
+    264 │                       {sortBy === "date" && (
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportDataTable.tsx:315:15 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    314 │             <div className="join">
+  > 315 │               <button
+        │               ^^^^^^^
+  > 316 │                 className="join-item btn btn-sm"
+  > 317 │                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+  > 318 │                 disabled={currentPage === 1}
+  > 319 │               >
+        │               ^
+    320 │                 <ChevronLeftIcon className="h-4 w-4" />
+    321 │               </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportDataTable.tsx:325:19 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    323 │               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+    324 │                 (page) => (
+  > 325 │                   <button
+        │                   ^^^^^^^
+  > 326 │                     key={page}
+         ...
+  > 330 │                     onClick={() => setCurrentPage(page)}
+  > 331 │                   >
+        │                   ^
+    332 │                     {page}
+    333 │                   </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportExport.tsx:59:15 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    58 │             <div className="dropdown dropdown-end">
+  > 59 │               <button tabIndex={0} className="btn btn-outline btn-sm">
+       │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    60 │                 <ArrowDownTrayIcon className="h-4 w-4" />
+    61 │                 エクスポート
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportExport.tsx:48:13 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    47 │           <div className="flex gap-2">
+  > 48 │             <button className="btn btn-outline btn-sm">
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    49 │               <ShareIcon className="h-4 w-4" />
+    50 │               共有
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportExport.tsx:53:13 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    51 │             </button>
+    52 │ 
+  > 53 │             <button className="btn btn-outline btn-sm">
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    54 │               <PrinterIcon className="h-4 w-4" />
+    55 │               印刷
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportExport.tsx:79:13 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    77 │             </div>
+    78 │ 
+  > 79 │             <button className="btn btn-ghost btn-sm">
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    80 │               <Cog6ToothIcon className="h-4 w-4" />
+    81 │             </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportFilters.tsx:22:15 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    20 │           <div className="space-y-3">
+    21 │             <div>
+  > 22 │               <label className="label">プリセット期間</label>
+       │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    23 │               <select className="select select-bordered select-sm w-full">
+    24 │                 <option>今月</option>
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/reports/ReportFilters.tsx:44:15 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    43 │             <div>
+  > 44 │               <label className="label">終了日</label>
+       │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    45 │               <input
+    46 │                 type="date"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/reports/ReportFilters.tsx:62:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    60 │             <div className="space-y-3">
+    61 │               <div>
+  > 62 │                 <label className="label">商品カテゴリ</label>
+       │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    63 │                 <select className="select select-bordered select-sm w-full">
+    64 │                   <option>すべて</option>
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/reports/ReportFilters.tsx:71:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    69 │               </div>
+    70 │               <div>
+  > 71 │                 <label className="label">地域</label>
+       │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    72 │                 <select className="select select-bordered select-sm w-full">
+    73 │                   <option>すべて</option>
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/reports/ReportFilters.tsx:90:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    88 │             <div className="space-y-3">
+    89 │               <div>
+  > 90 │                 <label className="label">業界</label>
+       │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    91 │                 <select className="select select-bordered select-sm w-full">
+    92 │                   <option>すべて</option>
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/reports/ReportFilters.tsx:100:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+     98 │               </div>
+     99 │               <div>
+  > 100 │                 <label className="label">企業規模</label>
+        │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    101 │                 <select className="select select-bordered select-sm w-full">
+    102 │                   <option>すべて</option>
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/reports/ReportFilters.tsx:35:15 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    34 │             <div>
+  > 35 │               <label className="label">開始日</label>
+       │               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    36 │               <input
+    37 │                 type="date"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/reports/ReportGrid.tsx:109:13 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    107 │           <h3 className="text-lg font-semibold">利用可能なレポート</h3>
+    108 │           <Link href="/reports/custom/new">
+  > 109 │             <button className="btn btn-primary btn-sm">
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    110 │               カスタムレポート作成
+    111 │             </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportGrid.tsx:136:19 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    134 │                     </div>
+    135 │                   </div>
+  > 136 │                   <button
+        │                   ^^^^^^^
+  > 137 │                     onClick={() => toggleFavorite(report.id)}
+  > 138 │                     className="btn btn-ghost btn-xs"
+  > 139 │                   >
+        │                   ^
+    140 │                     {report.isFavorite ? (
+    141 │                       <StarSolidIcon className="h-4 w-4 text-warning" />
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportGrid.tsx:161:21 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    159 │                 <div className="flex gap-1">
+    160 │                   <Link href={`/reports/${report.type}`} className="flex-1">
+  > 161 │                     <button className="btn btn-primary btn-sm w-full">
+        │                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    162 │                       <EyeIcon className="h-3 w-3" />
+    163 │                       表示
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportGrid.tsx:166:19 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    164 │                     </button>
+    165 │                   </Link>
+  > 166 │                   <button className="btn btn-ghost btn-sm">
+        │                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    167 │                     <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+    168 │                   </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportGrid.tsx:178:13 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    176 │         <div className="flex justify-center mt-6">
+    177 │           <div className="join">
+  > 178 │             <button className="join-item btn btn-sm">1</button>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    179 │             <button className="join-item btn btn-sm btn-active">2</button>
+    180 │             <button className="join-item btn btn-sm">3</button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportGrid.tsx:179:13 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    177 │           <div className="join">
+    178 │             <button className="join-item btn btn-sm">1</button>
+  > 179 │             <button className="join-item btn btn-sm btn-active">2</button>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    180 │             <button className="join-item btn btn-sm">3</button>
+    181 │           </div>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportGrid.tsx:180:13 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    178 │             <button className="join-item btn btn-sm">1</button>
+    179 │             <button className="join-item btn btn-sm btn-active">2</button>
+  > 180 │             <button className="join-item btn btn-sm">3</button>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    181 │           </div>
+    182 │         </div>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportHeader.tsx:36:11 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    34 │       <div className="flex items-center gap-4">
+    35 │         <Link href="/reports">
+  > 36 │           <button className="btn btn-ghost btn-sm">
+       │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    37 │             <ArrowLeftIcon className="h-4 w-4" />
+    38 │           </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/reports/ReportHeader.tsx:47:9 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    46 │       <div className="flex gap-2">
+  > 47 │         <button className="btn btn-outline btn-sm">
+       │         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    48 │           <ArrowPathIcon className="h-4 w-4" />
+    49 │           更新
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/DashboardCustomization.tsx:174:23 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    172 │                   >
+    173 │                     <div className="flex items-center gap-3">
+  > 174 │                       <button
+        │                       ^^^^^^^
+  > 175 │                         onClick={() => toggleWidget(widget.id)}
+  > 176 │                         className="btn btn-ghost btn-sm"
+  > 177 │                       >
+        │                       ^
+    178 │                         {widget.enabled ? (
+    179 │                           <EyeIcon className="h-4 w-4" />
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/DashboardCustomization.tsx:193:23 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    192 │                     <div className="flex items-center gap-1">
+  > 193 │                       <button
+        │                       ^^^^^^^
+  > 194 │                         onClick={() => moveWidget(widget.id, "up")}
+  > 195 │                         disabled={index === 0}
+  > 196 │                         className="btn btn-ghost btn-xs"
+  > 197 │                       >
+        │                       ^
+    198 │                         ↑
+    199 │                       </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/DashboardCustomization.tsx:200:23 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    198 │                         ↑
+    199 │                       </button>
+  > 200 │                       <button
+        │                       ^^^^^^^
+  > 201 │                         onClick={() => moveWidget(widget.id, "down")}
+  > 202 │                         disabled={index === widgets.length - 1}
+  > 203 │                         className="btn btn-ghost btn-xs"
+  > 204 │                       >
+        │                       ^
+    205 │                         ↓
+    206 │                       </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/DashboardCustomization.tsx:218:11 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    217 │         <div className="flex justify-end mt-6">
+  > 218 │           <button className="btn btn-primary" onClick={handleSave}>
+        │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    219 │             設定を保存
+    220 │           </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/DataManagement.tsx:91:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    89 │             <div className="space-y-3">
+    90 │               <div>
+  > 91 │                 <label className="label">インポートタイプ</label>
+       │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    92 │                 <select className="select select-bordered w-full max-w-xs">
+    93 │                   <option>顧客データ</option>
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/DataManagement.tsx:101:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    100 │               <div>
+  > 101 │                 <label className="label">ファイル選択</label>
+        │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    102 │                 <input
+    103 │                   type="file"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/IntegrationSettings.tsx:150:11 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    148 │             他のサービスとの連携をご希望の場合は、サポートチームまでお問い合わせください。
+    149 │           </p>
+  > 150 │           <button className="btn btn-outline btn-sm">統合リクエスト</button>
+        │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    151 │         </div>
+    152 │       </div>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/IntegrationSettings.tsx:131:21 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    129 │                     </>
+    130 │                   ) : (
+  > 131 │                     <button className="btn btn-primary btn-xs">接続</button>
+        │                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    132 │                   )}
+    133 │                 </div>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/IntegrationSettings.tsx:127:23 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    125 │                   {integration.status === "connected" ? (
+    126 │                     <>
+  > 127 │                       <button className="btn btn-outline btn-xs">設定</button>
+        │                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    128 │                       <button className="btn btn-error btn-xs">切断</button>
+    129 │                     </>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/IntegrationSettings.tsx:128:23 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    126 │                     <>
+    127 │                       <button className="btn btn-outline btn-xs">設定</button>
+  > 128 │                       <button className="btn btn-error btn-xs">切断</button>
+        │                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    129 │                     </>
+    130 │                   ) : (
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/NotificationSettings.tsx:187:11 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    186 │         <div className="flex justify-end mt-6">
+  > 187 │           <button className="btn btn-primary" onClick={handleSave}>
+        │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    188 │             設定を保存
+    189 │           </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/OrganizationSettings.tsx:74:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    73 │           <div>
+  > 74 │             <label className="label">組織規模</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    75 │             <select
+    76 │               className="select select-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/OrganizationSettings.tsx:211:11 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    210 │         <div className="flex justify-end mt-6">
+  > 211 │           <button className="btn btn-primary" onClick={handleSave}>
+        │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    212 │             設定を保存
+    213 │           </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/OrganizationSettings.tsx:38:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    36 │         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    37 │           <div>
+  > 38 │             <label className="label">組織名</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    39 │             <input
+    40 │               type="text"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/OrganizationSettings.tsx:53:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    52 │           <div>
+  > 53 │             <label className="label">業界</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    54 │             <select
+    55 │               className="select select-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/OrganizationSettings.tsx:94:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    93 │           <div>
+  > 94 │             <label className="label">ウェブサイト</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    95 │             <input
+    96 │               type="url"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/OrganizationSettings.tsx:109:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    108 │           <div>
+  > 109 │             <label className="label">電話番号</label>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    110 │             <input
+    111 │               type="tel"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/OrganizationSettings.tsx:124:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    123 │           <div>
+  > 124 │             <label className="label">法人番号</label>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    125 │             <input
+    126 │               type="text"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/OrganizationSettings.tsx:139:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    138 │           <div>
+  > 139 │             <label className="label">通貨</label>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    140 │             <select
+    141 │               className="select select-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/OrganizationSettings.tsx:157:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    156 │           <div>
+  > 157 │             <label className="label">タイムゾーン</label>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    158 │             <select
+    159 │               className="select select-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/OrganizationSettings.tsx:175:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    174 │           <div className="md:col-span-2">
+  > 175 │             <label className="label">住所</label>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    176 │             <textarea
+    177 │               className="textarea textarea-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/OrganizationSettings.tsx:190:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    189 │           <div>
+  > 190 │             <label className="label">会計年度開始月</label>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    191 │             <select
+    192 │               className="select select-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/PasswordSettings.tsx:27:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    25 │         <div className="space-y-4 max-w-md">
+    26 │           <div>
+  > 27 │             <label className="label">現在のパスワード</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    28 │             <input
+    29 │               type="password"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/PasswordSettings.tsx:42:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    41 │           <div>
+  > 42 │             <label className="label">新しいパスワード</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    43 │             <input
+    44 │               type="password"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/PasswordSettings.tsx:57:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    56 │           <div>
+  > 57 │             <label className="label">新しいパスワード（確認）</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    58 │             <input
+    59 │               type="password"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/PasswordSettings.tsx:71:11 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    69 │           </div>
+    70 │ 
+  > 71 │           <button className="btn btn-primary" onClick={handleChangePassword}>
+       │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    72 │             パスワードを変更
+    73 │           </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/ProfileSettings.tsx:160:11 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    159 │         <div className="flex justify-end mt-6">
+  > 160 │           <button className="btn btn-primary" onClick={handleSave}>
+        │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    161 │             設定を保存
+    162 │           </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/ProfileSettings.tsx:51:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    49 │         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    50 │           <div>
+  > 51 │             <label className="label">名前</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    52 │             <input
+    53 │               type="text"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/ProfileSettings.tsx:66:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    65 │           <div>
+  > 66 │             <label className="label">メールアドレス</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    67 │             <input
+    68 │               type="email"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/ProfileSettings.tsx:81:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    80 │           <div>
+  > 81 │             <label className="label">電話番号</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    82 │             <input
+    83 │               type="tel"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/ProfileSettings.tsx:96:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    95 │           <div>
+  > 96 │             <label className="label">部署</label>
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    97 │             <input
+    98 │               type="text"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/ProfileSettings.tsx:111:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    110 │           <div>
+  > 111 │             <label className="label">役職</label>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    112 │             <input
+    113 │               type="text"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/ProfileSettings.tsx:126:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    125 │           <div>
+  > 126 │             <label className="label">タイムゾーン</label>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    127 │             <select
+    128 │               className="select select-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/ProfileSettings.tsx:144:13 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    143 │           <div className="md:col-span-2">
+  > 144 │             <label className="label">自己紹介</label>
+        │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    145 │             <textarea
+    146 │               className="textarea textarea-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/ProfileSettings.tsx:39:13 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    37 │           </div>
+    38 │           <div>
+  > 39 │             <button className="btn btn-outline btn-sm">
+       │             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    40 │               <CameraIcon className="h-4 w-4" />
+    41 │               写真を変更
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/SecuritySettings.tsx:58:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    56 │             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    57 │               <div>
+  > 58 │                 <label className="label">最小文字数</label>
+       │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    59 │                 <input
+    60 │                   type="number"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/SecuritySettings.tsx:78:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    77 │               <div>
+  > 78 │                 <label className="label">パスワード有効期限（日）</label>
+       │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    79 │                 <input
+    80 │                   type="number"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/SecuritySettings.tsx:222:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    220 │             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    221 │               <div>
+  > 222 │                 <label className="label">セッションタイムアウト（分）</label>
+        │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    223 │                 <input
+    224 │                   type="number"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/SecuritySettings.tsx:242:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    241 │               <div>
+  > 242 │                 <label className="label">最大同時セッション数</label>
+        │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    243 │                 <input
+    244 │                   type="number"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/SecuritySettings.tsx:288:19 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    286 │               {securitySettings.loginRestrictions.enableIpWhitelist && (
+    287 │                 <div>
+  > 288 │                   <label className="label">許可IPアドレス（改行区切り）</label>
+        │                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    289 │                   <textarea
+    290 │                     className="textarea textarea-bordered w-full"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/SecuritySettings.tsx:309:19 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    307 │               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    308 │                 <div>
+  > 309 │                   <label className="label">最大ログイン失敗回数</label>
+        │                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    310 │                   <input
+    311 │                     type="number"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/SecuritySettings.tsx:329:19 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    328 │                 <div>
+  > 329 │                   <label className="label">ロックアウト時間（分）</label>
+        │                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    330 │                   <input
+    331 │                     type="number"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/SecuritySettings.tsx:375:17 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    374 │               <div>
+  > 375 │                 <label className="label">ログ保存期間（日）</label>
+        │                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    376 │                 <input
+    377 │                   type="number"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/SecuritySettings.tsx:398:11 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    397 │         <div className="flex justify-end mt-6">
+  > 398 │           <button className="btn btn-primary" onClick={handleSave}>
+        │           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    399 │             設定を保存
+    400 │           </button>
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/SettingsNavigation.tsx:67:17 lint/a11y/useButtonType ━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Provide an explicit type prop for the button element.
+  
+    65 │             {navigationItems.map((item) => (
+    66 │               <Link key={item.id} href={item.href}>
+  > 67 │                 <button
+       │                 ^^^^^^^
+  > 68 │                   className={`flex items-center gap-3 w-full p-3 rounded-lg transition-colors ${
+        ...
+  > 72 │                   }`}
+  > 73 │                 >
+       │                 ^
+    74 │                   <item.icon className="h-5 w-5" />
+    75 │                   <div className="text-left">
+  
+  i The default type of a button is submit, which causes the submission of a form when placed inside a `form` element. This is likely not the behaviour that you want inside a React application.
+  
+  i Allowed button types are: submit, button or reset
+  
+
+src/components/settings/UserManagement.tsx:200:19 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    198 │               <div className="space-y-4">
+    199 │                 <div>
+  > 200 │                   <label className="label">名前</label>
+        │                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    201 │                   <input
+    202 │                     type="text"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/UserManagement.tsx:209:19 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    208 │                 <div>
+  > 209 │                   <label className="label">メールアドレス</label>
+        │                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    210 │                   <input
+    211 │                     type="email"
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+src/components/settings/UserManagement.tsx:218:19 lint/a11y/noLabelWithoutControl ━━━━━━━━━━━━━━━━━━
+
+  × A form label must be associated with an input.
+  
+    217 │                 <div>
+  > 218 │                   <label className="label">ロール</label>
+        │                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    219 │                   <select className="select select-bordered w-full">
+    220 │                     <option value="viewer">閲覧者</option>
+  
+  i Consider adding a `for` or `htmlFor` attribute to the label element or moving the input element to inside the label element.
+  
+
+Checked 330 files in 340ms. No fixes applied.
+Found 87 errors.
+Found 2 warnings.
+lint ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+  
+

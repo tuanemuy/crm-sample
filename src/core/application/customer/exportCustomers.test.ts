@@ -7,11 +7,7 @@ import type { Contact } from "@/core/domain/contact/types";
 import type { Customer } from "@/core/domain/customer/types";
 import type { Deal } from "@/core/domain/deal/types";
 import { ApplicationError, RepositoryError } from "@/lib/error";
-import {
-  type ExportCustomersInput,
-  type ExportResult,
-  exportCustomers,
-} from "./exportCustomers";
+import { type ExportCustomersInput, exportCustomers } from "./exportCustomers";
 
 // Mock repositories
 const mockCustomerRepository = {
@@ -68,14 +64,24 @@ const mockActivityRepository = {
   update: vi.fn(),
   delete: vi.fn(),
   findByCustomerId: vi.fn(),
+  findByDealId: vi.fn(),
+  findByLeadId: vi.fn(),
   findByAssignedUser: vi.fn(),
+  findByCreatedByUser: vi.fn(),
   findByType: vi.fn(),
   findUpcoming: vi.fn(),
   findOverdue: vi.fn(),
   findCompleted: vi.fn(),
+  findTodayActivities: vi.fn(),
+  getCalendarEvents: vi.fn(),
+  getStats: vi.fn(),
   search: vi.fn(),
   complete: vi.fn(),
+  updateStatus: vi.fn(),
   setReminder: vi.fn(),
+  clearReminder: vi.fn(),
+  bulkUpdateStatus: vi.fn(),
+  bulkDelete: vi.fn(),
 };
 
 // Mock context with required repositories
@@ -138,7 +144,12 @@ describe("exportCustomers", () => {
 
   describe("input validation", () => {
     it("should use default values when not provided", async () => {
-      const input = {} as ExportCustomersInput;
+      const input: ExportCustomersInput = {
+        format: "csv",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
+      };
 
       const mockCustomers: Customer[] = [
         {
@@ -166,6 +177,9 @@ describe("exportCustomers", () => {
       const input: ExportCustomersInput = {
         // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
         format: "invalid" as any,
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const result = await exportCustomers(mockContext, input);
@@ -179,10 +193,14 @@ describe("exportCustomers", () => {
 
     it("should validate filter date ranges", async () => {
       const input: ExportCustomersInput = {
+        format: "csv",
         filter: {
           createdAfter: new Date("2023-01-01"),
           createdBefore: new Date("2022-01-01"), // Before the after date
         },
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [];
@@ -199,10 +217,14 @@ describe("exportCustomers", () => {
 
     it("should handle valid size and status enums", async () => {
       const input: ExportCustomersInput = {
+        format: "csv",
         filter: {
           size: "large",
           status: "active",
         },
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [
@@ -230,6 +252,9 @@ describe("exportCustomers", () => {
     it("should handle repository error when fetching customers", async () => {
       const input: ExportCustomersInput = {
         format: "csv",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       mockCustomerRepository.list.mockResolvedValue(
@@ -249,6 +274,8 @@ describe("exportCustomers", () => {
       const input: ExportCustomersInput = {
         format: "csv",
         includeContacts: true,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [
@@ -279,7 +306,9 @@ describe("exportCustomers", () => {
     it("should handle errors when fetching deals gracefully", async () => {
       const input: ExportCustomersInput = {
         format: "json",
+        includeContacts: false,
         includeDeals: true,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [
@@ -310,6 +339,8 @@ describe("exportCustomers", () => {
     it("should handle errors when fetching activities gracefully", async () => {
       const input: ExportCustomersInput = {
         format: "json",
+        includeContacts: false,
+        includeDeals: false,
         includeActivities: true,
       };
 
@@ -343,6 +374,9 @@ describe("exportCustomers", () => {
     it("should export customers to CSV format", async () => {
       const input: ExportCustomersInput = {
         format: "csv",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [
@@ -382,6 +416,8 @@ describe("exportCustomers", () => {
       const input: ExportCustomersInput = {
         format: "csv",
         includeContacts: true,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [
@@ -436,7 +472,9 @@ describe("exportCustomers", () => {
       const customerId = uuidv7();
       const input: ExportCustomersInput = {
         format: "csv",
+        includeContacts: false,
         includeDeals: true,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [
@@ -467,7 +505,7 @@ describe("exportCustomers", () => {
           title: "Deal 2",
           customerId,
           amount: "20000",
-          stage: "closed-won",
+          stage: "closed_won",
           probability: 100,
           assignedUserId: uuidv7(),
           competitors: [],
@@ -494,6 +532,9 @@ describe("exportCustomers", () => {
     it("should handle empty customer list", async () => {
       const input: ExportCustomersInput = {
         format: "csv",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       mockCustomerRepository.list.mockResolvedValue(
@@ -513,6 +554,9 @@ describe("exportCustomers", () => {
     it("should export customers to JSON format", async () => {
       const input: ExportCustomersInput = {
         format: "json",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [
@@ -599,9 +643,12 @@ describe("exportCustomers", () => {
           id: uuidv7(),
           type: "meeting",
           subject: "Initial meeting",
+          status: "completed",
+          priority: "medium",
           customerId,
           assignedUserId: uuidv7(),
-          isCompleted: true,
+          createdByUserId: uuidv7(),
+          completedAt: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -634,6 +681,9 @@ describe("exportCustomers", () => {
     it("should export customers to XLSX format", async () => {
       const input: ExportCustomersInput = {
         format: "xlsx",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [
@@ -671,6 +721,9 @@ describe("exportCustomers", () => {
       const assignedUserId = uuidv7();
       const input: ExportCustomersInput = {
         format: "csv",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
         filter: {
           keyword: "tech",
           industry: "Technology",
@@ -715,6 +768,9 @@ describe("exportCustomers", () => {
     it("should handle special characters in CSV export", async () => {
       const input: ExportCustomersInput = {
         format: "csv",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [
@@ -744,6 +800,9 @@ describe("exportCustomers", () => {
     it("should handle large datasets", async () => {
       const input: ExportCustomersInput = {
         format: "json",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = Array.from(
@@ -774,6 +833,9 @@ describe("exportCustomers", () => {
     it("should handle customers with null/undefined optional fields", async () => {
       const input: ExportCustomersInput = {
         format: "csv",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [
@@ -803,6 +865,9 @@ describe("exportCustomers", () => {
     it("should handle date parsing in CSV", async () => {
       const input: ExportCustomersInput = {
         format: "csv",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const createdAt = new Date("2023-01-15T10:30:00Z");
@@ -833,6 +898,9 @@ describe("exportCustomers", () => {
     it("should generate filename with current date", async () => {
       const input: ExportCustomersInput = {
         format: "csv",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       const mockCustomers: Customer[] = [];
@@ -852,6 +920,9 @@ describe("exportCustomers", () => {
     it("should handle unexpected errors gracefully", async () => {
       const input: ExportCustomersInput = {
         format: "csv",
+        includeContacts: false,
+        includeDeals: false,
+        includeActivities: false,
       };
 
       // Mock an unexpected error during processing

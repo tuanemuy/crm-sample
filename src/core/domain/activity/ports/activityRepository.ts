@@ -83,4 +83,19 @@ export interface ActivityRepository {
     userId?: string,
     limit?: number,
   ): Promise<Result<Activity[], RepositoryError>>;
+
+  // Additional methods for reminders and bulk operations
+  setReminder(
+    id: string,
+    reminderDate: Date,
+  ): Promise<Result<Activity, RepositoryError>>;
+
+  clearReminder(id: string): Promise<Result<Activity, RepositoryError>>;
+
+  bulkUpdateStatus(
+    ids: string[],
+    status: "planned" | "in_progress" | "completed" | "cancelled",
+  ): Promise<Result<Activity[], RepositoryError>>;
+
+  bulkDelete(ids: string[]): Promise<Result<void, RepositoryError>>;
 }

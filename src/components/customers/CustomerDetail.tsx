@@ -229,12 +229,15 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
 
         <div className="flex gap-2">
           <Link href={`/customers/${customerId}/edit`}>
-            <button className="btn btn-primary btn-sm gap-2">
+            <button type="button" className="btn btn-primary btn-sm gap-2">
               <PencilIcon className="h-4 w-4" />
               編集
             </button>
           </Link>
-          <button className="btn btn-error btn-outline btn-sm gap-2">
+          <button
+            type="button"
+            className="btn btn-error btn-outline btn-sm gap-2"
+          >
             <TrashIcon className="h-4 w-4" />
             削除
           </button>
@@ -244,24 +247,28 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
       {/* タブナビゲーション */}
       <div className="tabs tabs-lifted">
         <button
+          type="button"
           className={`tab ${activeTab === "overview" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("overview")}
         >
           概要
         </button>
         <button
+          type="button"
           className={`tab ${activeTab === "deals" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("deals")}
         >
           商談 ({deals.length})
         </button>
         <button
+          type="button"
           className={`tab ${activeTab === "activities" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("activities")}
         >
           活動履歴 ({activities.length})
         </button>
         <button
+          type="button"
           className={`tab ${activeTab === "documents" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("documents")}
         >
@@ -406,7 +413,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                 </div>
 
                 <div className="card-actions mt-4">
-                  <button className="btn btn-primary btn-sm btn-block gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm btn-block gap-2"
+                  >
                     <ChatBubbleLeftRightIcon className="h-4 w-4" />
                     コンタクトを追加
                   </button>
@@ -420,7 +430,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">関連商談</h3>
-              <button className="btn btn-primary btn-sm gap-2">
+              <button type="button" className="btn btn-primary btn-sm gap-2">
                 <PlusIcon className="h-4 w-4" />
                 新規商談
               </button>
@@ -466,7 +476,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">活動履歴</h3>
-              <button className="btn btn-primary btn-sm gap-2">
+              <button type="button" className="btn btn-primary btn-sm gap-2">
                 <PlusIcon className="h-4 w-4" />
                 活動を追加
               </button>
@@ -501,7 +511,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">ドキュメント</h3>
-              <button className="btn btn-primary btn-sm gap-2">
+              <button type="button" className="btn btn-primary btn-sm gap-2">
                 <DocumentDuplicateIcon className="h-4 w-4" />
                 アップロード
               </button>
@@ -513,7 +523,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                 <p className="text-base-content/70 mt-4">
                   ドキュメントがまだアップロードされていません
                 </p>
-                <button className="btn btn-primary btn-sm mt-4 gap-2">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm mt-4 gap-2"
+                >
                   <PlusIcon className="h-4 w-4" />
                   最初のドキュメントをアップロード
                 </button>

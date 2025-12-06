@@ -156,12 +156,13 @@ export function CustomerForm({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="label">
+              <label className="label" htmlFor="customer-name">
                 <span className="label-text">
                   会社名 <span className="text-error">*</span>
                 </span>
               </label>
               <input
+                id="customer-name"
                 type="text"
                 placeholder="株式会社例示コーポレーション"
                 className="input input-bordered w-full"
@@ -172,12 +173,13 @@ export function CustomerForm({
             </div>
 
             <div>
-              <label className="label">
+              <label className="label" htmlFor="customer-industry">
                 <span className="label-text">
                   業界 <span className="text-error">*</span>
                 </span>
               </label>
               <select
+                id="customer-industry"
                 className="select select-bordered w-full"
                 value={formData.industry}
                 onChange={(e) => handleInputChange("industry", e.target.value)}
@@ -192,12 +194,13 @@ export function CustomerForm({
             </div>
 
             <div>
-              <label className="label">
+              <label className="label" htmlFor="customer-size">
                 <span className="label-text">
                   企業規模 <span className="text-error">*</span>
                 </span>
               </label>
               <select
+                id="customer-size"
                 className="select select-bordered w-full"
                 value={formData.size}
                 onChange={(e) => handleInputChange("size", e.target.value)}
@@ -212,13 +215,14 @@ export function CustomerForm({
             </div>
 
             <div>
-              <label className="label">
+              <label className="label" htmlFor="customer-location">
                 <span className="label-text flex items-center gap-1">
                   <MapPinIcon className="h-4 w-4" />
                   所在地
                 </span>
               </label>
               <input
+                id="customer-location"
                 type="text"
                 placeholder="東京都渋谷区"
                 className="input input-bordered w-full"
@@ -228,13 +232,14 @@ export function CustomerForm({
             </div>
 
             <div>
-              <label className="label">
+              <label className="label" htmlFor="customer-founded-year">
                 <span className="label-text flex items-center gap-1">
                   <CalendarIcon className="h-4 w-4" />
                   設立年
                 </span>
               </label>
               <input
+                id="customer-founded-year"
                 type="number"
                 placeholder="2020"
                 className="input input-bordered w-full"
@@ -248,13 +253,14 @@ export function CustomerForm({
             </div>
 
             <div className="md:col-span-2">
-              <label className="label">
+              <label className="label" htmlFor="customer-website">
                 <span className="label-text flex items-center gap-1">
                   <GlobeAltIcon className="h-4 w-4" />
                   ウェブサイト
                 </span>
               </label>
               <input
+                id="customer-website"
                 type="url"
                 placeholder="https://example.com"
                 className="input input-bordered w-full"
@@ -264,13 +270,14 @@ export function CustomerForm({
             </div>
 
             <div className="md:col-span-2">
-              <label className="label">
+              <label className="label" htmlFor="customer-description">
                 <span className="label-text flex items-center gap-1">
                   <DocumentTextIcon className="h-4 w-4" />
                   企業説明
                 </span>
               </label>
               <textarea
+                id="customer-description"
                 placeholder="企業の概要や事業内容を記載してください"
                 className="textarea textarea-bordered w-full h-24"
                 value={formData.description}
@@ -293,12 +300,13 @@ export function CustomerForm({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="label">
+              <label className="label" htmlFor="contact-person-name">
                 <span className="label-text">
                   担当者名 <span className="text-error">*</span>
                 </span>
               </label>
               <input
+                id="contact-person-name"
                 type="text"
                 placeholder="山田太郎"
                 className="input input-bordered w-full"
@@ -311,10 +319,11 @@ export function CustomerForm({
             </div>
 
             <div>
-              <label className="label">
+              <label className="label" htmlFor="contact-person-title">
                 <span className="label-text">役職</span>
               </label>
               <input
+                id="contact-person-title"
                 type="text"
                 placeholder="営業部長"
                 className="input input-bordered w-full"
@@ -326,13 +335,14 @@ export function CustomerForm({
             </div>
 
             <div>
-              <label className="label">
+              <label className="label" htmlFor="contact-person-email">
                 <span className="label-text flex items-center gap-1">
                   <EnvelopeIcon className="h-4 w-4" />
                   メールアドレス <span className="text-error">*</span>
                 </span>
               </label>
               <input
+                id="contact-person-email"
                 type="email"
                 placeholder="yamada@example.com"
                 className="input input-bordered w-full"
@@ -345,13 +355,14 @@ export function CustomerForm({
             </div>
 
             <div>
-              <label className="label">
+              <label className="label" htmlFor="contact-person-phone">
                 <span className="label-text flex items-center gap-1">
                   <PhoneIcon className="h-4 w-4" />
                   電話番号
                 </span>
               </label>
               <input
+                id="contact-person-phone"
                 type="tel"
                 placeholder="03-1234-5678"
                 className="input input-bordered w-full"
@@ -363,10 +374,11 @@ export function CustomerForm({
             </div>
 
             <div className="md:col-span-2">
-              <label className="label">
+              <label className="label" htmlFor="contact-person-department">
                 <span className="label-text">部署</span>
               </label>
               <input
+                id="contact-person-department"
                 type="text"
                 placeholder="営業部"
                 className="input input-bordered w-full"
@@ -387,12 +399,13 @@ export function CustomerForm({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="label">
+              <label className="label" htmlFor="assigned-user">
                 <span className="label-text">
                   担当者 <span className="text-error">*</span>
                 </span>
               </label>
               <select
+                id="assigned-user"
                 className="select select-bordered w-full"
                 value={formData.assignedUserId}
                 onChange={(e) =>
@@ -409,10 +422,11 @@ export function CustomerForm({
             </div>
 
             <div>
-              <label className="label">
+              <label className="label" htmlFor="customer-status">
                 <span className="label-text">ステータス</span>
               </label>
               <select
+                id="customer-status"
                 className="select select-bordered w-full"
                 value={formData.status}
                 onChange={(e) =>
@@ -428,11 +442,12 @@ export function CustomerForm({
             </div>
 
             <div className="md:col-span-2">
-              <label className="label">
+              <label className="label" htmlFor="parent-customer">
                 <span className="label-text">親会社</span>
                 <span className="label-text-alt">関連企業がある場合のみ</span>
               </label>
               <input
+                id="parent-customer"
                 type="text"
                 placeholder="親会社名を検索..."
                 className="input input-bordered w-full"

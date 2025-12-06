@@ -192,7 +192,7 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-export function DealDetail({ dealId }: DealDetailProps) {
+export function DealDetail({ dealId: _dealId }: DealDetailProps) {
   const [activeTab, setActiveTab] = useState<
     "overview" | "activities" | "products"
   >("overview");
@@ -344,9 +344,9 @@ export function DealDetail({ dealId }: DealDetailProps) {
                 <div className="mt-4">
                   <h3 className="font-medium mb-2">競合他社</h3>
                   <div className="flex gap-2">
-                    {mockDeal.competitors.map((competitor, index) => (
+                    {mockDeal.competitors.map((competitor) => (
                       <span
-                        key={index}
+                        key={competitor}
                         className="badge badge-error badge-outline"
                       >
                         {competitor}
@@ -370,24 +370,27 @@ export function DealDetail({ dealId }: DealDetailProps) {
           <div className="card bg-base-100 shadow-sm">
             <div className="card-body">
               <div className="tabs tabs-bordered">
-                <a
+                <button
+                  type="button"
                   className={`tab ${activeTab === "overview" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("overview")}
                 >
                   概要
-                </a>
-                <a
+                </button>
+                <button
+                  type="button"
                   className={`tab ${activeTab === "products" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("products")}
                 >
                   商品・サービス
-                </a>
-                <a
+                </button>
+                <button
+                  type="button"
                   className={`tab ${activeTab === "activities" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("activities")}
                 >
                   営業活動履歴
-                </a>
+                </button>
               </div>
 
               <div className="mt-6">
@@ -429,8 +432,8 @@ export function DealDetail({ dealId }: DealDetailProps) {
                           </tr>
                         </thead>
                         <tbody>
-                          {mockDeal.products.map((product, index) => (
-                            <tr key={index}>
+                          {mockDeal.products.map((product) => (
+                            <tr key={product.name}>
                               <td className="font-medium">{product.name}</td>
                               <td>{product.quantity}</td>
                               <td>{formatCurrency(product.unitPrice)}</td>

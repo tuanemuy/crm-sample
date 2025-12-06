@@ -771,4 +771,97 @@ export class DrizzlePqliteActivityRepository implements ActivityRepository {
       return err(new RepositoryError("Failed to search activities", error));
     }
   }
+
+  async setReminder(
+    id: string,
+    reminderDate: Date,
+  ): Promise<Result<Activity, RepositoryError>> {
+    try {
+      const result = await this.db
+        .update(activities)
+        .set({ scheduledAt: reminderDate })
+        .where(eq(activities.id, id))
+        .returning();
+
+      const activity = result[0];
+      if (!activity) {
+        return err(new RepositoryError("Activity not found"));
+      }
+
+      return validate(activitySchema, activity).mapErr((error) => {
+        return new RepositoryError("Invalid activity data", error);
+      });
+    } catch (error) {
+      return err(new RepositoryError("Failed to set reminder", error));
+    }
+  }
+
+  async clearReminder(id: string): Promise<Result<Activity, RepositoryError>> {
+    try {
+      const result = await this.db
+        .update(activities)
+        .set({ scheduledAt: null })
+        .where(eq(activities.id, id))
+        .returning();
+
+      const activity = result[0];
+      if (!activity) {
+        return err(new RepositoryError("Activity not found"));
+      }
+
+      return validate(activitySchema, activity).mapErr((error) => {
+        return new RepositoryError("Invalid activity data", error);
+      });
+    } catch (error) {
+      return err(new RepositoryError("Failed to clear reminder", error));
+    }
+  }
+
+  async bulkUpdateStatus(
+    ids: string[],
+    status: "planned" | "in_progress" | "completed" | "cancelled",
+  ): Promise<Result<Activity[], RepositoryError>> {
+    try {
+      const updateData: Partial<UpdateActivityParams> = {
+        status,
+        completedAt: status === "completed" ? new Date() : undefined,
+      };
+
+      const results = await Promise.all(
+        ids.map(async (id) => {
+          const result = await this.db
+            .update(activities)
+            .set(updateData)
+            .where(eq(activities.id, id))
+            .returning();
+          return result[0];
+        }),
+      );
+
+      const validActivities = results
+        .filter((activity) => activity !== undefined)
+        .map((activity) => validate(activitySchema, activity).unwrapOr(null))
+        .filter((activity) => activity !== null);
+
+      return ok(validActivities);
+    } catch (error) {
+      return err(new RepositoryError("Failed to bulk update status", error));
+    }
+  }
+
+  async bulkDelete(ids: string[]): Promise<Result<void, RepositoryError>> {
+    try {
+      await Promise.all(
+        ids.map(async (id) => {
+          await this.db.delete(activities).where(eq(activities.id, id));
+        }),
+      );
+
+      return ok(undefined);
+    } catch (error) {
+      return err(
+        new RepositoryError("Failed to bulk delete activities", error),
+      );
+    }
+  }
 }

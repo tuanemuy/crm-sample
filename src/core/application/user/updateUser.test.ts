@@ -93,7 +93,7 @@ describe("updateUser", () => {
 
       // This should be caught by schema validation before reaching the function
       // But we test the application behavior anyway
-      const result = await updateUser(mockContext, input);
+      const _result = await updateUser(mockContext, input);
 
       // The function might not explicitly validate UUIDs, depending on implementation
       // This test ensures we handle the case where invalid data somehow gets through

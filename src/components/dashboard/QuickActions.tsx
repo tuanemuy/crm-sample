@@ -1,7 +1,6 @@
 import {
   BriefcaseIcon,
   DocumentPlusIcon,
-  PlusIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -37,12 +36,15 @@ export function QuickActions() {
 
   return (
     <div className="flex gap-2">
-      {actions.map((action, index) => {
+      {actions.map((action, _index) => {
         const Icon = action.icon;
 
         return (
-          <Link key={index} href={action.href}>
-            <button className={`btn ${action.color} btn-sm gap-2`}>
+          <Link key={action.href} href={action.href}>
+            <button
+              type="button"
+              className={`btn ${action.color} btn-sm gap-2`}
+            >
               <Icon className="h-4 w-4" />
               {action.label}
             </button>

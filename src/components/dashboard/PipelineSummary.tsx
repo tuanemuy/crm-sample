@@ -62,16 +62,18 @@ export function PipelineSummary() {
               合計: {totalCount}件 / {formatCurrency(totalValue)}
             </p>
           </div>
-          <button className="btn btn-sm btn-primary">詳細表示</button>
+          <button type="button" className="btn btn-sm btn-primary">
+            詳細表示
+          </button>
         </div>
 
         <div className="space-y-4">
-          {stages.map((stage, index) => {
+          {stages.map((stage, _index) => {
             const percentage = (stage.value / totalValue) * 100;
 
             return (
               <div
-                key={index}
+                key={stage.name}
                 className="flex items-center justify-between p-4 rounded-lg bg-base-200"
               >
                 <div className="flex items-center gap-3">
@@ -101,11 +103,11 @@ export function PipelineSummary() {
 
         <div className="mt-6">
           <div className="flex h-2 rounded-full overflow-hidden bg-base-300">
-            {stages.map((stage, index) => {
+            {stages.map((stage, _index) => {
               const percentage = (stage.value / totalValue) * 100;
               return (
                 <div
-                  key={index}
+                  key={stage.name}
                   className={stage.color}
                   style={{ width: `${percentage}%` }}
                 />

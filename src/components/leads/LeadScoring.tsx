@@ -461,12 +461,23 @@ export function LeadScoring() {
           <div key={category.id} className="card bg-base-100 shadow-sm">
             <div className="card-body">
               <div
+                // biome-ignore lint/a11y/useSemanticElements: Complex accordion with nested buttons requires role="button" to avoid HTML spec violation
+                role="button"
+                tabIndex={0}
                 className="flex items-center justify-between cursor-pointer"
                 onClick={() =>
                   setActiveCategory(
                     activeCategory === category.id ? null : category.id,
                   )
                 }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setActiveCategory(
+                      activeCategory === category.id ? null : category.id,
+                    );
+                  }
+                }}
               >
                 <div className="flex items-center gap-4">
                   <div>

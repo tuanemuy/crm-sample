@@ -74,17 +74,22 @@ export function CustomerFilters() {
             <FunnelIcon className="h-4 w-4" />
             フィルター
           </h3>
-          <button onClick={clearFilters} className="btn btn-ghost btn-xs">
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="btn btn-ghost btn-xs"
+          >
             クリア
           </button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="label">
+            <label className="label" htmlFor="industry-filter">
               <span className="label-text">業界</span>
             </label>
             <select
+              id="industry-filter"
               className="select select-bordered w-full select-sm"
               value={filters.industry}
               onChange={(e) => handleFilterChange("industry", e.target.value)}
@@ -98,10 +103,11 @@ export function CustomerFilters() {
           </div>
 
           <div>
-            <label className="label">
+            <label className="label" htmlFor="size-filter">
               <span className="label-text">企業規模</span>
             </label>
             <select
+              id="size-filter"
               className="select select-bordered w-full select-sm"
               value={filters.size}
               onChange={(e) => handleFilterChange("size", e.target.value)}
@@ -115,10 +121,11 @@ export function CustomerFilters() {
           </div>
 
           <div>
-            <label className="label">
+            <label className="label" htmlFor="status-filter">
               <span className="label-text">ステータス</span>
             </label>
             <select
+              id="status-filter"
               className="select select-bordered w-full select-sm"
               value={filters.status}
               onChange={(e) => handleFilterChange("status", e.target.value)}
@@ -132,10 +139,11 @@ export function CustomerFilters() {
           </div>
 
           <div>
-            <label className="label">
+            <label className="label" htmlFor="assigned-user-filter">
               <span className="label-text">担当者</span>
             </label>
             <select
+              id="assigned-user-filter"
               className="select select-bordered w-full select-sm"
               value={filters.assignedUser}
               onChange={(e) =>

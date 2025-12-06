@@ -160,8 +160,6 @@ describe("getCustomerDetails", () => {
         updatedAt: new Date(),
         contacts: [],
         deals: [],
-        activities: [],
-        documents: [],
       };
 
       mockCustomerRepository.findByIdWithRelations.mockResolvedValue(
@@ -203,11 +201,8 @@ describe("getCustomerDetails", () => {
             name: "John Doe",
             title: "CEO",
             email: "john@example.com",
-            phone: "+1234567890",
             isPrimary: true,
             isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
         ],
         deals: [
@@ -217,62 +212,24 @@ describe("getCustomerDetails", () => {
             customerId,
             amount: "100000",
             stage: "negotiation",
-            probability: 75,
-            assignedUserId,
-            competitors: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-        activities: [
-          {
-            id: uuidv7(),
-            type: "meeting",
-            subject: "Initial meeting",
-            customerId,
-            assignedUserId,
-            isCompleted: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-        documents: [
-          {
-            id: uuidv7(),
-            name: "contract.pdf",
-            entityType: "customer",
-            entityId: customerId,
-            mimeType: "application/pdf",
-            size: 1024,
-            uploadedBy: uuidv7(),
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
         ],
         assignedUser: {
           id: assignedUserId,
           name: "Assigned User",
           email: "assigned@example.com",
-          role: "manager",
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         },
         parentCustomer: {
           id: parentCustomerId,
           name: "Parent Company",
           status: "active",
-          createdAt: new Date(),
-          updatedAt: new Date(),
         },
-        childrenCustomers: [
+        childCustomers: [
           {
             id: uuidv7(),
             name: "Child Company",
             status: "active",
             parentCustomerId: customerId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
         ],
       };
@@ -300,8 +257,6 @@ describe("getCustomerDetails", () => {
         updatedAt: new Date(),
         contacts: [],
         deals: [],
-        activities: [],
-        documents: [],
       };
 
       mockCustomerRepository.findByIdWithRelations.mockResolvedValue(
@@ -314,8 +269,6 @@ describe("getCustomerDetails", () => {
       const customer = result._unsafeUnwrap();
       expect(customer.contacts).toEqual([]);
       expect(customer.deals).toEqual([]);
-      expect(customer.activities).toEqual([]);
-      expect(customer.documents).toEqual([]);
     });
 
     it("should handle customer with various status types", async () => {
@@ -333,8 +286,6 @@ describe("getCustomerDetails", () => {
           updatedAt: new Date(),
           contacts: [],
           deals: [],
-          activities: [],
-          documents: [],
         };
 
         mockCustomerRepository.findByIdWithRelations.mockResolvedValue(
@@ -366,8 +317,6 @@ describe("getCustomerDetails", () => {
             email: "primary@example.com",
             isPrimary: true,
             isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
           {
             id: uuidv7(),
@@ -376,8 +325,6 @@ describe("getCustomerDetails", () => {
             email: "secondary@example.com",
             isPrimary: false,
             isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
           {
             id: uuidv7(),
@@ -386,13 +333,9 @@ describe("getCustomerDetails", () => {
             email: "inactive@example.com",
             isPrimary: false,
             isActive: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
         ],
         deals: [],
-        activities: [],
-        documents: [],
       };
 
       mockCustomerRepository.findByIdWithRelations.mockResolvedValue(
@@ -404,8 +347,8 @@ describe("getCustomerDetails", () => {
       expect(result.isOk()).toBe(true);
       const customer = result._unsafeUnwrap();
       expect(customer.contacts).toHaveLength(3);
-      expect(customer.contacts.filter((c) => c.isPrimary)).toHaveLength(1);
-      expect(customer.contacts.filter((c) => c.isActive)).toHaveLength(2);
+      expect(customer.contacts?.filter((c) => c.isPrimary)).toHaveLength(1);
+      expect(customer.contacts?.filter((c) => c.isActive)).toHaveLength(2);
     });
 
     it("should handle customer with deals in different stages", async () => {
@@ -424,11 +367,6 @@ describe("getCustomerDetails", () => {
             customerId,
             amount: "50000",
             stage: "prospecting",
-            probability: 25,
-            assignedUserId: uuidv7(),
-            competitors: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
           {
             id: uuidv7(),
@@ -436,11 +374,6 @@ describe("getCustomerDetails", () => {
             customerId,
             amount: "100000",
             stage: "closed-won",
-            probability: 100,
-            assignedUserId: uuidv7(),
-            competitors: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
           {
             id: uuidv7(),
@@ -448,15 +381,8 @@ describe("getCustomerDetails", () => {
             customerId,
             amount: "75000",
             stage: "closed-lost",
-            probability: 0,
-            assignedUserId: uuidv7(),
-            competitors: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
         ],
-        activities: [],
-        documents: [],
       };
 
       mockCustomerRepository.findByIdWithRelations.mockResolvedValue(
@@ -469,13 +395,13 @@ describe("getCustomerDetails", () => {
       const customer = result._unsafeUnwrap();
       expect(customer.deals).toHaveLength(3);
       expect(
-        customer.deals.find((d) => d.stage === "prospecting"),
+        customer.deals?.find((d) => d.stage === "prospecting"),
       ).toBeDefined();
       expect(
-        customer.deals.find((d) => d.stage === "closed-won"),
+        customer.deals?.find((d) => d.stage === "closed-won"),
       ).toBeDefined();
       expect(
-        customer.deals.find((d) => d.stage === "closed-lost"),
+        customer.deals?.find((d) => d.stage === "closed-lost"),
       ).toBeDefined();
     });
 
@@ -495,8 +421,6 @@ describe("getCustomerDetails", () => {
           updatedAt: new Date(),
           contacts: [],
           deals: [],
-          activities: [],
-          documents: [],
         };
 
         mockCustomerRepository.findByIdWithRelations.mockResolvedValue(
@@ -522,23 +446,17 @@ describe("getCustomerDetails", () => {
         updatedAt: new Date(),
         contacts: [],
         deals: [],
-        activities: [],
-        documents: [],
         parentCustomer: {
           id: parentCustomerId,
           name: "Parent Company",
           status: "active",
-          createdAt: new Date(),
-          updatedAt: new Date(),
         },
-        childrenCustomers: [
+        childCustomers: [
           {
             id: uuidv7(),
             name: "Sibling Company",
             status: "active",
             parentCustomerId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
           },
         ],
       };
@@ -553,7 +471,7 @@ describe("getCustomerDetails", () => {
       const customer = result._unsafeUnwrap();
       expect(customer.parentCustomer).toBeDefined();
       expect(customer.parentCustomer?.name).toBe("Parent Company");
-      expect(customer.childrenCustomers).toHaveLength(1);
+      expect(customer.childCustomers).toHaveLength(1);
     });
 
     it("should handle very large data sets", async () => {
@@ -577,8 +495,6 @@ describe("getCustomerDetails", () => {
         updatedAt: new Date(),
         contacts: largeContacts,
         deals: [],
-        activities: [],
-        documents: [],
       };
 
       mockCustomerRepository.findByIdWithRelations.mockResolvedValue(
@@ -590,7 +506,7 @@ describe("getCustomerDetails", () => {
       expect(result.isOk()).toBe(true);
       const customer = result._unsafeUnwrap();
       expect(customer.contacts).toHaveLength(100);
-      expect(customer.contacts.filter((c) => c.isPrimary)).toHaveLength(1);
+      expect(customer.contacts?.filter((c) => c.isPrimary)).toHaveLength(1);
     });
   });
 });

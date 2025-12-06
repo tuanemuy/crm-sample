@@ -179,7 +179,7 @@ const getScoreColor = (score: number) => {
   return "text-error";
 };
 
-export function LeadDetail({ leadId }: LeadDetailProps) {
+export function LeadDetail({ leadId: _leadId }: LeadDetailProps) {
   const [activeTab, setActiveTab] = useState<
     "overview" | "scoring" | "activities"
   >("overview");
@@ -281,24 +281,27 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
           <div className="card bg-base-100 shadow-sm">
             <div className="card-body">
               <div className="tabs tabs-bordered">
-                <a
+                <button
+                  type="button"
                   className={`tab ${activeTab === "overview" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("overview")}
                 >
                   概要
-                </a>
-                <a
+                </button>
+                <button
+                  type="button"
                   className={`tab ${activeTab === "scoring" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("scoring")}
                 >
                   スコアリング詳細
-                </a>
-                <a
+                </button>
+                <button
+                  type="button"
                   className={`tab ${activeTab === "activities" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("activities")}
                 >
                   営業活動履歴
-                </a>
+                </button>
               </div>
 
               <div className="mt-6">
@@ -330,7 +333,7 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
                 {activeTab === "scoring" && (
                   <div className="space-y-6">
                     {mockScoreDetails.map((category, index) => (
-                      <div key={index} className="space-y-3">
+                      <div key={category.category} className="space-y-3">
                         <div className="flex items-center justify-between">
                           <h3 className="text-lg font-semibold">
                             {category.category}
@@ -345,9 +348,9 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          {category.factors.map((factor, factorIndex) => (
+                          {category.factors.map((factor) => (
                             <div
-                              key={factorIndex}
+                              key={factor.name}
                               className="flex items-center gap-3"
                             >
                               <div className="flex-1">

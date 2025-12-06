@@ -75,9 +75,9 @@ export function DashboardStats() {
 
   return (
     <div className="stats stats-horizontal shadow w-full bg-base-100">
-      {stats.map((stat, index) => (
+      {stats.map((stat, _index) => (
         <StatCard
-          key={index}
+          key={stat.title}
           title={stat.title}
           value={stat.value}
           change={stat.change}

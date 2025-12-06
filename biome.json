@@ -25,6 +25,9 @@
       "nursery": {
         "useUniqueElementIds": "off"
       },
+      "performance": {
+        "noImgElement": "off"
+      },
       "style": {
         "noParameterAssign": "error",
         "useAsConstAssertion": "error",

@@ -87,7 +87,8 @@ describe("listUsers", () => {
   describe("repository error handling", () => {
     it("should handle repository error when listing users", async () => {
       const input: ListUsersInput = {
-        pagination: { page: 1, limit: 10 },
+        pagination: { page: 1, limit: 10, order: "desc", orderBy: "createdAt" },
+        sortOrder: "desc",
       };
 
       mockUserRepository.list.mockResolvedValue(
@@ -107,7 +108,8 @@ describe("listUsers", () => {
   describe("successful listing", () => {
     it("should list users with minimal input", async () => {
       const input: ListUsersInput = {
-        pagination: { page: 1, limit: 10 },
+        pagination: { page: 1, limit: 10, order: "desc", orderBy: "createdAt" },
+        sortOrder: "desc",
       };
 
       const users: User[] = [
@@ -146,7 +148,7 @@ describe("listUsers", () => {
 
     it("should list users with filters", async () => {
       const input: ListUsersInput = {
-        pagination: { page: 1, limit: 10 },
+        pagination: { page: 1, limit: 10, order: "desc", orderBy: "createdAt" },
         filter: {
           keyword: "john",
           role: "user",
@@ -182,7 +184,8 @@ describe("listUsers", () => {
 
     it("should return empty list when no users found", async () => {
       const input: ListUsersInput = {
-        pagination: { page: 1, limit: 10 },
+        pagination: { page: 1, limit: 10, order: "desc", orderBy: "createdAt" },
+        sortOrder: "desc",
         filter: {
           keyword: "nonexistent",
         },
@@ -200,7 +203,8 @@ describe("listUsers", () => {
 
     it("should handle different pagination parameters", async () => {
       const input: ListUsersInput = {
-        pagination: { page: 2, limit: 5 },
+        pagination: { page: 2, limit: 5, order: "desc", orderBy: "createdAt" },
+        sortOrder: "desc",
       };
 
       const users: User[] = [
@@ -236,7 +240,13 @@ describe("listUsers", () => {
 
       for (const role of testCases) {
         const input: ListUsersInput = {
-          pagination: { page: 1, limit: 10 },
+          pagination: {
+            page: 1,
+            limit: 10,
+            order: "desc",
+            orderBy: "createdAt",
+          },
+          sortOrder: "desc",
           filter: { role },
         };
 
@@ -272,7 +282,12 @@ describe("listUsers", () => {
 
       for (const sortBy of sortFields) {
         const input: ListUsersInput = {
-          pagination: { page: 1, limit: 10 },
+          pagination: {
+            page: 1,
+            limit: 10,
+            order: "desc",
+            orderBy: "createdAt",
+          },
           sortBy,
           sortOrder: "desc",
         };
@@ -289,7 +304,8 @@ describe("listUsers", () => {
 
     it("should handle users with optional lastLoginAt", async () => {
       const input: ListUsersInput = {
-        pagination: { page: 1, limit: 10 },
+        pagination: { page: 1, limit: 10, order: "desc", orderBy: "createdAt" },
+        sortOrder: "desc",
       };
 
       const users: User[] = [
@@ -329,7 +345,8 @@ describe("listUsers", () => {
 
     it("should handle inactive users when filtered", async () => {
       const input: ListUsersInput = {
-        pagination: { page: 1, limit: 10 },
+        pagination: { page: 1, limit: 10, order: "desc", orderBy: "createdAt" },
+        sortOrder: "desc",
         filter: { isActive: false },
       };
 
@@ -358,7 +375,8 @@ describe("listUsers", () => {
 
     it("should handle boundary pagination values", async () => {
       const input: ListUsersInput = {
-        pagination: { page: 1, limit: 1 },
+        pagination: { page: 1, limit: 1, order: "desc", orderBy: "createdAt" },
+        sortOrder: "desc",
       };
 
       const expectedResult = { items: [], count: 0 };

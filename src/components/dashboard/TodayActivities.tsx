@@ -109,7 +109,9 @@ export function TodayActivities() {
               完了: {completedCount}件 / 予定: {upcomingCount}件
             </p>
           </div>
-          <button className="btn btn-sm btn-ghost">カレンダー</button>
+          <button type="button" className="btn btn-sm btn-ghost">
+            カレンダー
+          </button>
         </div>
 
         <div className="space-y-3">
@@ -155,7 +157,7 @@ export function TodayActivities() {
         </div>
 
         <div className="mt-4">
-          <button className="btn btn-sm btn-primary btn-block">
+          <button type="button" className="btn btn-sm btn-primary btn-block">
             新しい予定を追加
           </button>
         </div>

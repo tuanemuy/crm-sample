@@ -6,10 +6,10 @@ export function Footer() {
           <p>&copy; 2025 CRM System. All rights reserved.</p>
         </div>
         <div className="flex gap-4 text-sm">
-          <a href="#" className="link link-hover">
+          <a href="/privacy" className="link link-hover">
             プライバシーポリシー
           </a>
-          <a href="#" className="link link-hover">
+          <a href="/terms" className="link link-hover">
             利用規約
           </a>
         </div>

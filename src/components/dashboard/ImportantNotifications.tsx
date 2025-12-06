@@ -98,7 +98,9 @@ export function ImportantNotifications() {
               </p>
             )}
           </div>
-          <button className="btn btn-sm btn-ghost">すべて表示</button>
+          <button type="button" className="btn btn-sm btn-ghost">
+            すべて表示
+          </button>
         </div>
 
         <div className="space-y-3">
@@ -148,8 +150,15 @@ export function ImportantNotifications() {
 
                     {!notification.isRead && (
                       <div className="flex items-center gap-2 mt-2">
-                        <button className="btn btn-xs btn-primary">確認</button>
-                        <button className="btn btn-xs btn-ghost">後で</button>
+                        <button
+                          type="button"
+                          className="btn btn-xs btn-primary"
+                        >
+                          確認
+                        </button>
+                        <button type="button" className="btn btn-xs btn-ghost">
+                          後で
+                        </button>
                       </div>
                     )}
                   </div>

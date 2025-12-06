@@ -1,13 +1,7 @@
 import type { Result } from "neverthrow";
-import { z } from "zod/v4";
-import type { User } from "@/core/domain/user/types";
+import type { DeactivateUserInput, User } from "@/core/domain/user/types";
 import { ApplicationError } from "@/lib/error";
 import type { Context } from "../context";
-
-export const deactivateUserInputSchema = z.object({
-  id: z.string().uuid(),
-});
-export type DeactivateUserInput = z.infer<typeof deactivateUserInputSchema>;
 
 export async function deactivateUser(
   context: Context,

@@ -3,11 +3,7 @@ import { v7 as uuidv7 } from "uuid";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Context } from "@/core/application/context";
 import type { Customer } from "@/core/domain/customer/types";
-import {
-  ApplicationError,
-  RepositoryError,
-  ValidationError,
-} from "@/lib/error";
+import { ApplicationError, RepositoryError } from "@/lib/error";
 import { type SearchCustomersInput, searchCustomers } from "./searchCustomers";
 
 // Mock repositories

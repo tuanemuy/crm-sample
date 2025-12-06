@@ -6,12 +6,16 @@ export const customerSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   industry: z.string().optional(),
-  size: z.enum(["small", "medium", "large", "enterprise"]).optional(),
+  size: z
+    .enum(["small", "medium", "large", "enterprise", "startup"])
+    .optional(),
   location: z.string().optional(),
   foundedYear: z.number().int().optional(),
   website: z.string().url().optional(),
   description: z.string().optional(),
-  status: z.enum(["active", "inactive", "archived"]).default("active"),
+  status: z
+    .enum(["active", "inactive", "archived", "prospect"])
+    .default("active"),
   parentCustomerId: z.string().uuid().optional(),
   assignedUserId: z.string().uuid().optional(),
   createdAt: z.date(),
@@ -24,7 +28,9 @@ export type Customer = z.infer<typeof customerSchema>;
 export const createCustomerInputSchema = z.object({
   name: z.string().min(1).max(255),
   industry: z.string().optional(),
-  size: z.enum(["small", "medium", "large", "enterprise"]).optional(),
+  size: z
+    .enum(["small", "medium", "large", "enterprise", "startup"])
+    .optional(),
   location: z.string().optional(),
   foundedYear: z
     .number()
@@ -48,8 +54,10 @@ export type UpdateCustomerInput = z.infer<typeof updateCustomerInputSchema>;
 export const customerFilterSchema = z.object({
   keyword: z.string().optional(),
   industry: z.string().optional(),
-  size: z.enum(["small", "medium", "large", "enterprise"]).optional(),
-  status: z.enum(["active", "inactive", "archived"]).optional(),
+  size: z
+    .enum(["small", "medium", "large", "enterprise", "startup"])
+    .optional(),
+  status: z.enum(["active", "inactive", "archived", "prospect"]).optional(),
   assignedUserId: z.string().uuid().optional(),
   parentCustomerId: z.string().uuid().optional(),
 });
@@ -70,12 +78,16 @@ export type ListCustomersQuery = z.infer<typeof listCustomersQuerySchema>;
 export const createCustomerParamsSchema = z.object({
   name: z.string(),
   industry: z.string().optional(),
-  size: z.enum(["small", "medium", "large", "enterprise"]).optional(),
+  size: z
+    .enum(["small", "medium", "large", "enterprise", "startup"])
+    .optional(),
   location: z.string().optional(),
   foundedYear: z.number().int().optional(),
   website: z.string().url().optional(),
   description: z.string().optional(),
-  status: z.enum(["active", "inactive", "archived"]).default("active"),
+  status: z
+    .enum(["active", "inactive", "archived", "prospect"])
+    .default("active"),
   parentCustomerId: z.string().uuid().optional(),
   assignedUserId: z.string().uuid().optional(),
 });
@@ -95,6 +107,8 @@ export const customerWithRelationsSchema = customerSchema.extend({
         email: z.string().email().optional(),
         title: z.string().optional(),
         isPrimary: z.boolean(),
+        customerId: z.string().uuid(),
+        isActive: z.boolean().default(true),
       }),
     )
     .optional(),
@@ -105,6 +119,7 @@ export const customerWithRelationsSchema = customerSchema.extend({
         title: z.string(),
         amount: z.string(),
         stage: z.string(),
+        customerId: z.string().uuid(),
       }),
     )
     .optional(),
@@ -119,6 +134,7 @@ export const customerWithRelationsSchema = customerSchema.extend({
     .object({
       id: z.string().uuid(),
       name: z.string(),
+      status: z.enum(["active", "inactive", "archived", "prospect"]),
     })
     .optional(),
   childCustomers: z
@@ -126,6 +142,8 @@ export const customerWithRelationsSchema = customerSchema.extend({
       z.object({
         id: z.string().uuid(),
         name: z.string(),
+        status: z.enum(["active", "inactive", "archived", "prospect"]),
+        parentCustomerId: z.string().uuid().optional(),
       }),
     )
     .optional(),
@@ -145,3 +163,25 @@ export const customerStatsSchema = z.object({
 });
 
 export type CustomerStats = z.infer<typeof customerStatsSchema>;
+
+// Customer export input schema
+export const exportCustomersInputSchema = z.object({
+  format: z.enum(["json", "csv", "xlsx"]),
+  includeContacts: z.boolean().default(false),
+  includeDeals: z.boolean().default(false),
+  includeActivities: z.boolean().default(false),
+  filter: customerFilterSchema.optional(),
+});
+
+export type ExportCustomersInput = z.infer<typeof exportCustomersInputSchema>;
+
+// Update customer input with ID for forms
+export const updateCustomerInputWithIdSchema = updateCustomerInputSchema.extend(
+  {
+    id: z.string().uuid(),
+  },
+);
+
+export type UpdateCustomerInputWithId = z.infer<
+  typeof updateCustomerInputWithIdSchema
+>;
